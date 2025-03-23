@@ -6,11 +6,12 @@ import FocusIconDark from "../../public/focus-icon-dark.svg";
 import IconButton from "@/components/IconButton";
 import { useState } from "react";
 import Image from "next/image";
+import TodoSection from "@/sections/TodoSection";
 
 function DashBoard() {
     return (
-        <div className="bg-amber-200 h-screen w-screen flex gap-4 p-5">
-            <div className="absolute top-0 right-0 m-5 bg-amber-200 flex flex-col gap-2">
+        <div className=" h-screen w-screen flex gap-4 p-5">
+            <div className="absolute top-0 right-0 m-5  flex flex-col gap-2">
                 <Image
                     src={TempUserAvatar}
                     alt="user avatar"
@@ -26,8 +27,10 @@ function DashBoard() {
                 </button>
             </div>
 
-            <div className="bg-amber-300 h-full w-1/3">col 1</div>
-            <div className="bg-amber-300 h-full w-2/3">col 1</div>
+            <div className="border h-full w-1/4">
+                <TodoSection />
+            </div>
+            <div className="border h-full w-3/4">col 2</div>
         </div>
     );
 }
