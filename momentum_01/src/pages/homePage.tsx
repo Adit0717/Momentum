@@ -115,7 +115,7 @@ function HomePage() {
                                 onChange={(e) => setSignUpEmail(e.target.value)}
                             />
                             <TextField
-                                placeholder="Password"
+                                placeholder="Set password"
                                 type="password"
                                 value={signUpPassword}
                                 onChange={(e) =>
