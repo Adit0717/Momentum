@@ -29,23 +29,45 @@ function TodoSection() {
     return (
         <div className="h-full w-full flex flex-col overflow-scroll">
             {/* Top Header bar Fixed */}
-            <div className="backdrop-blur-md sticky top-0 z-10 ">
+            <div
+                ref={headerRef}
+                className="backdrop-blur-md sticky top-0 z-10 "
+            >
                 <div className="w-full flex items-center justify-between ps-4 pe-2 py-4">
                     <div className="text-4xl ">All Tasks</div>
                     <button
                         onClick={toggleDropdown}
                         className="h-12 w-12 rounded-full flex justify-center items-center hover:bg-gray-100"
                     >
-                        <span className="material-icons">more_vert</span>
+                        {optionsDropdown ? (
+                            <span className="material-icons">close</span>
+                        ) : (
+                            <span className="material-icons">more_vert</span>
+                        )}
                     </button>
                 </div>
 
                 {/* Options Dropdown */}
                 {optionsDropdown && (
                     <div className="w-full flex flex-col transition-all duration-300">
-                        <a className="p-2 px-4 hover:bg-gray-100">Option 1</a>
-                        <a className="p-2 px-4 hover:bg-gray-100">Option 2</a>
-                        <a className="p-2 px-4 hover:bg-gray-100">Option 3</a>
+                        <a
+                            onClick={() => alert("option1 clicked")}
+                            className="p-2 px-4 hover:bg-gray-100"
+                        >
+                            Option 1
+                        </a>
+                        <a
+                            onClick={() => alert("option2 clicked")}
+                            className="p-2 px-4 hover:bg-gray-100"
+                        >
+                            Option 2
+                        </a>
+                        <a
+                            onClick={() => alert("option3 clicked")}
+                            className="p-2 px-4 hover:bg-gray-100"
+                        >
+                            Option 3
+                        </a>
                     </div>
                 )}
             </div>
