@@ -26,8 +26,20 @@ function TodoSection() {
         };
     }, [headerRef]);
 
+    const [addNewTaskInputValue, setAddNewTaskInputValue] = useState("");
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setAddNewTaskInputValue(e.target.value);
+    };
+
+    const addTask = () => {
+        alert(`New task: ${addNewTaskInputValue}`);
+        // TODO: Implement actual add-task logic
+        setAddNewTaskInputValue("");
+    };
+
     return (
-        <div className="h-full w-full flex flex-col overflow-scroll">
+        <div className="h-full w-full flex flex-col overflow-scroll no-scrollbar">
             {/* Top Header bar Fixed */}
             <div
                 ref={headerRef}
@@ -52,27 +64,30 @@ function TodoSection() {
                     <div className="w-full flex flex-col transition-all duration-300">
                         <a
                             onClick={() => alert("option1 clicked")}
-                            className="p-2 px-4 hover:bg-gray-100"
+                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer"
                         >
                             Option 1
                         </a>
                         <a
                             onClick={() => alert("option2 clicked")}
-                            className="p-2 px-4 hover:bg-gray-100"
+                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer"
                         >
                             Option 2
                         </a>
                         <a
-                            onClick={() => alert("option3 clicked")}
-                            className="p-2 px-4 hover:bg-gray-100"
+                            onClick={() =>
+                                alert("Show completed tasks clicked")
+                            }
+                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer"
                         >
-                            Option 3
+                            Show completed tasks
                         </a>
                     </div>
                 )}
             </div>
 
-            <div>
+            {/* Temp text placeholder */}
+            <div className="hidden">
                 In proident fugiat officia Lorem exercitation consequat fugiat
                 labore fugiat. Nulla et sit culpa pariatur Lorem tempor
                 adipisicing cillum amet anim velit enim. Reprehenderit fugiat
@@ -700,6 +715,23 @@ function TodoSection() {
                 non proident veniam id fugiat officia. Occaecat et laborum sint
                 est irure occaecat fugiat. Non dolore id fugiat incididunt. Esse
                 tempor labore dolore mollit velit aliquip.
+            </div>
+            <div className="flex-1 bg-amber-50"></div>
+
+            {/* Bottom add new task */}
+            <div className="bg-black flex sticky bottom-0 z-10">
+                <input
+                    onChange={handleChange}
+                    value={addNewTaskInputValue}
+                    placeholder="Add new"
+                    className="h-16 text-white flex-1 text-wrap px-4 text-lg focus:outline-none focus:ring-0"
+                />
+                <button
+                    onClick={addTask}
+                    className="w-16 h-16 cursor-pointer hover:bg-blue-500 duration-100 flex items-center justify-center "
+                >
+                    <span className="material-icons text-white">add</span>
+                </button>
             </div>
         </div>
     );
