@@ -12,7 +12,8 @@
     "material-icons": "^1.13.14",
     "next": "15.2.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-textarea-autosize": "^8.5.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

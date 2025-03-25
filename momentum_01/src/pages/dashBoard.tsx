@@ -27,9 +27,10 @@ function DashBoard() {
                 </button>
             </div>
 
-            <div className="border h-full w-1/4">
+            <div className="border border-gray-300 h-full w-1/4 overflow-hidden">
                 <TodoSection />
             </div>
+
             <div className="border h-full w-3/4">col 2</div>
         </div>
     );
