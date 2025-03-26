@@ -1,3 +1,6 @@
+// ! Know issues:
+// ! 1. Can't put description first and todo title later
+
 "use client";
 
 import TodoCard from "@/components/TodoCard";
@@ -197,7 +200,7 @@ function TodoSection() {
 
             {/* // ? Conditional description and date-time picker: visible when textfield is focused*/}
             {isFocused && (
-                <div className="sticky bg-gray-300 bottom-16 flex flex-col items-start p-2 gap-2 w-full">
+                <div className="sticky backdrop-blur-md border-t-2 bottom-16 flex flex-col items-start p-2 gap-2 w-full">
                     <TextareaAutosize
                         minRows={1}
                         maxRows={4}
