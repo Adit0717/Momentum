@@ -15,6 +15,7 @@ export default function TodoCard({
     isCompleted,
     onToggleComplete,
 }: TodoCardProps) {
+    // ? Context menu (view and delete)
     const [menuOpen, setMenuOpen] = useState(false);
     const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
     const cardRef = useRef<HTMLDivElement>(null);
@@ -92,7 +93,7 @@ export default function TodoCard({
             onContextMenu={handleContextMenu} // ? listening for right click
             // onClick={handleCloseMenu} // ? clicking anywhere on the card closes the menu
         >
-            <div className="flex items-center justify-between px-4 py-3  bg-white hover:bg-gray-100">
+            <div className="flex items-center justify-between px-4 py-3 bg-white hover:bg-gray-100">
                 {/* Left Section: Checkbox + Title */}
                 <div className="flex items-center gap-2">
                     <input
@@ -119,7 +120,7 @@ export default function TodoCard({
             {/* Context Menu */}
             {menuOpen && (
                 <div
-                    className="absolute backdrop-blur-md border border-gray-100 z-50"
+                    className="absolute backdrop-blur-md border border-gray-500 z-50"
                     style={{
                         top: menuPos.y,
                         left: menuPos.x,

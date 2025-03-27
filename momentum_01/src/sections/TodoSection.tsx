@@ -170,7 +170,7 @@ function TodoSection() {
                             onClick={() => alert("option2 clicked")}
                             className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200"
                         >
-                            Option 2
+                            Show descriptions
                         </a>
                         <a
                             onClick={() =>
@@ -198,9 +198,12 @@ function TodoSection() {
                 ))}
             </div>
 
-            {/* // ? Conditional description and date-time picker: visible when textfield is focused*/}
+            {/* // ? Conditional description and date-time picker: visible when textfield is focused */}
             {isFocused && (
-                <div className="sticky backdrop-blur-md border-t-2 bottom-16 flex flex-col items-start p-2 gap-2 w-full">
+                <div
+                    className="sticky backdrop-blur-md border-t-2 bottom-16 flex flex-col items-start p-2 gap-2 w-full"
+                    style={{ backgroundColor: "#ffffff20" }}
+                >
                     <TextareaAutosize
                         minRows={1}
                         maxRows={4}
@@ -210,12 +213,16 @@ function TodoSection() {
                         placeholder="Description"
                         className="w-full px-2 py-2 focus:outline-none focus:ring-0 resize-none"
                     />
-                    <input
-                        type="datetime-local"
-                        value={dateTime}
-                        onChange={handleDateTimeChange}
-                        className="px-2 py-2 focus:outline-none focus:ring-0 "
-                    />
+                    <div className="px-2 flex items-center gap-2">
+                        <div className="text-sm text-gray-700">Due on</div>
+
+                        <input
+                            type="datetime-local"
+                            value={dateTime}
+                            onChange={handleDateTimeChange}
+                            className=" py-2 focus:outline-none focus:ring-0 "
+                        />
+                    </div>
                 </div>
             )}
             {/* // ? Bottom add new task textfield*/}

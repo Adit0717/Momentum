@@ -11,7 +11,13 @@ import TodoSection from "@/sections/TodoSection";
 function DashBoard() {
     return (
         <div className=" h-screen w-screen flex gap-4 p-5">
-            <div className="absolute top-0 right-0 m-5  flex flex-col gap-2">
+            {/* // ? Right top button */}
+            <div
+                className="absolute top-0 right-0 m-5  flex flex-col gap-2 bg-white pb-3 ps-3 border-b-1 border-s-1"
+                style={{
+                    borderEndStartRadius: "36px",
+                }}
+            >
                 <Image
                     src={TempUserAvatar}
                     alt="user avatar"
