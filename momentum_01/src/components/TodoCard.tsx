@@ -43,11 +43,14 @@ export default function TodoCard({
 
     const handleView = () => {
         console.log("View tasks:", title);
+        // todo: Handle view/edit todo logic
         handleCloseMenu();
     };
 
     const handleDelete = () => {
         console.log("Delete task:", title);
+        // todo: Handle delete todo logic
+
         handleCloseMenu();
     };
 
@@ -131,11 +134,11 @@ export default function TodoCard({
                         onClick={handleView}
                         className="block w-full text-left px-4 py-2 hover:bg-gray-300 hover:ps-6 hover:pe-4 transition-all duration-150"
                     >
-                        View
+                        View / Edit
                     </button>
                     <button
                         onClick={handleDelete}
-                        className="block w-full text-left px-4 py-2 pe-6 hover:bg-red-300 hover:ps-6 hover:pe-4 transition-all duration-150"
+                        className="block w-full text-left px-4 py-2 pe-6 hover:bg-red-300 hover:text-red-900 hover:ps-6 hover:pe-4 transition-all duration-150"
                     >
                         Delete
                     </button>

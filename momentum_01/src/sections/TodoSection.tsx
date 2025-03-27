@@ -1,6 +1,9 @@
 // ! Know issues:
 // ! 1. Can't put description first and todo title later
 
+// todo: Todo -> context-menu -> view, create a todo pop-up to edit and view it
+// todo: Add category/tags feature for todos
+
 "use client";
 
 import TodoCard from "@/components/TodoCard";
@@ -162,23 +165,40 @@ function TodoSection() {
                     <div className="w-full flex flex-col transition-all duration-300 border-b-2">
                         <a
                             onClick={() => alert("option1 clicked")}
-                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200"
+                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center"
                         >
-                            Option 1
+                            Show categories
+                            <span className="text-sm font-bold text-green-600">
+                                ON
+                            </span>
                         </a>
                         <a
                             onClick={() => alert("option2 clicked")}
-                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200"
+                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center"
                         >
                             Show descriptions
+                            <span className="text-sm font-bold text-green-600">
+                                ON
+                            </span>
                         </a>
                         <a
                             onClick={() =>
                                 alert("Show completed tasks clicked")
                             }
-                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200"
+                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center "
                         >
                             Show completed tasks
+                            <span className="text-sm font-bold text-gray-400">
+                                OFF
+                            </span>
+                        </a>
+                        <a
+                            onClick={() =>
+                                alert("Show completed tasks clicked")
+                            }
+                            className="p-2 px-4 cursor-pointer hover:ps-6 hover:text-red-900 hover:bg-red-300 duration-200"
+                        >
+                            Delete all tasks
                         </a>
                     </div>
                 )}
