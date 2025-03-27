@@ -2,10 +2,11 @@
 // ! 1. Can't put description first and todo title later
 
 // todo: Todo -> context-menu -> view, create a todo pop-up to edit and view it
-// todo: Add category/tags feature for todos
+// * DONE todo: Add category/tags feature for todos
 
 "use client";
 
+import CategoryPill from "@/components/CategoryPill";
 import TodoCard from "@/components/TodoCard";
 import "material-icons/iconfont/material-icons.css";
 import { useEffect, useRef, useState } from "react";
@@ -52,15 +53,41 @@ function TodoSection() {
         setDateTime(e.target.value);
     };
 
-    // ? on Submit function - captures title of task, description, and date-time. Prints on console.
+    // ? Categories (static)
+    const [categories, setCategories] = useState<string[]>([]);
+    const [categoryInput, setCategoryInput] = useState("");
+
+    // ? Add category on ENTER key
+    const handleCategoryKeyDown = (
+        e: React.KeyboardEvent<HTMLInputElement>
+    ) => {
+        if (e.key === "Enter") {
+            e.preventDefault(); // Prevent form submission / line break
+            const newCategory = categoryInput.trim();
+            if (newCategory.length > 0 && !categories.includes(newCategory)) {
+                setCategories((prev) => [...prev, newCategory]);
+            }
+            setCategoryInput("");
+        }
+    };
+
+    // ? Remove category (optional)
+    const removeCategory = (cat: string) => {
+        setCategories((prev) => prev.filter((c) => c !== cat));
+    };
+
+    // ? on Submit function - captures title of task, description, date-time, category. Prints on console.
     const addTask = () => {
         console.log("New Task:", addNewTaskInputValue);
         console.log("Description:", description);
         console.log("Date/Time:", dateTime);
+        console.log("Categories:", categories);
         // Reset fields
         setAddNewTaskInputValue("");
         setDescription("");
         setDateTime("");
+        setCategories([]);
+        setCategoryInput("");
         setIsFocused(false);
 
         // TODO: Implement actual add-task logic
@@ -231,7 +258,7 @@ function TodoSection() {
                         value={description}
                         onChange={handleDescriptionChange}
                         placeholder="Description"
-                        className="w-full px-2 py-2 focus:outline-none focus:ring-0 resize-none"
+                        className="w-full px-2 py-2 focus:outline-none focus:ring-0 resize-none "
                     />
                     <div className="px-2 flex items-center gap-2">
                         <div className="text-sm text-gray-700">Due on</div>
@@ -240,7 +267,31 @@ function TodoSection() {
                             type="datetime-local"
                             value={dateTime}
                             onChange={handleDateTimeChange}
-                            className=" py-2 focus:outline-none focus:ring-0 "
+                            className=" py-2 focus:outline-none focus:ring-0 text-sm"
+                        />
+                    </div>
+
+                    {/* // ? Categories */}
+                    {/* Display existing category pills */}
+                    <div className="px-2 flex gap-1 flex-wrap">
+                        {categories.map((cat, idx) => (
+                            <CategoryPill key={idx} label={cat} />
+                        ))}
+                    </div>
+                    <div className="flex px-2 gap-2 items-center">
+                        <span
+                            className="material-icons text-gray-500"
+                            style={{ fontSize: "20px" }}
+                        >
+                            search
+                        </span>
+                        <input
+                            className="px-2 py-2 w-full focus:outline-none text-sm"
+                            placeholder={`Add categories`}
+                            value={categoryInput}
+                            onChange={(e) => setCategoryInput(e.target.value)}
+                            onKeyDown={handleCategoryKeyDown}
+                            // onSubmit={() => alert("Enter pressed.")}
                         />
                     </div>
                 </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import CategoryPill from "./CategoryPill";
 
 interface TodoCardProps {
     title: string;
@@ -96,34 +97,44 @@ export default function TodoCard({
             onContextMenu={handleContextMenu} // ? listening for right click
             // onClick={handleCloseMenu} // ? clicking anywhere on the card closes the menu
         >
-            <div className="flex items-center justify-between px-4 py-3 bg-white hover:bg-gray-100">
+            <div className="flex flex-col justify-between px-4 py-3 bg-white hover:bg-gray-100 gap-2">
                 {/* Left Section: Checkbox + Title */}
-                <div className="flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        checked={isCompleted}
-                        onChange={onToggleComplete}
-                        className="w-5 h-5 accent-blue-500"
-                    />
-                    <span
-                        className={`text-lg ${
-                            isCompleted
-                                ? "line-through text-gray-500"
-                                : "text-black"
-                        }`}
-                    >
-                        {title}
-                    </span>
-                </div>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            checked={isCompleted}
+                            onChange={onToggleComplete}
+                            className="w-5 h-5 accent-blue-500"
+                        />
+                        <span
+                            className={`text-lg ${
+                                isCompleted
+                                    ? "line-through text-gray-500"
+                                    : "text-black"
+                            }`}
+                        >
+                            {title}
+                        </span>
+                    </div>
 
-                {/* Right Section: Time */}
-                <div className="text-sm text-gray-600">{time}</div>
+                    {/* Right Section: Time */}
+                    <div className="text-sm text-gray-600">{time}</div>
+                </div>
+                <div className="ps-7 text-sm w-full text-gray-500">
+                    Meeting with Jack, Kayla, Sumita
+                </div>
+                <div className="ps-7 flex flex-wrap gap-1 text-sm">
+                    <CategoryPill label="Category #1" />
+                    <CategoryPill label="Category #2" />
+                    <CategoryPill label="Category #3" />
+                </div>
             </div>
 
             {/* Context Menu */}
             {menuOpen && (
                 <div
-                    className="absolute backdrop-blur-md border border-gray-500 z-50"
+                    className="absolute backdrop-blur-md border border-gray-300 z-50"
                     style={{
                         top: menuPos.y,
                         left: menuPos.x,

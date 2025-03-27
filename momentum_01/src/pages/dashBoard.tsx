@@ -35,7 +35,7 @@ function DashBoard() {
 
             <div
                 className="border border-gray-300 h-full overflow-hidden "
-                style={{ minWidth: "400px", maxWidth: "800px" }}
+                style={{ minWidth: "400px", maxWidth: "400px" }}
             >
                 <TodoSection />
             </div>
