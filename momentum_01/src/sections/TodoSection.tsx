@@ -3,11 +3,13 @@
 
 // todo: Todo -> context-menu -> view, create a todo pop-up to edit and view it
 // * DONE todo: Add category/tags feature for todos
+// * DONE todo: TodoSection Menu -> make a window pop-up to view/edit categories
 
 "use client";
 
 import CategoryPill from "@/components/CategoryPill";
 import TodoCard from "@/components/TodoCard";
+import { todos as initialTodos } from "@/data/todos";
 import "material-icons/iconfont/material-icons.css";
 import { useEffect, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
@@ -54,39 +56,40 @@ function TodoSection() {
     };
 
     // ? Categories (static)
-    const [categories, setCategories] = useState<string[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState("");
     const [categoryInput, setCategoryInput] = useState("");
 
     // ? Add category on ENTER key
+    // Separate function for handling category input on Enter key
     const handleCategoryKeyDown = (
         e: React.KeyboardEvent<HTMLInputElement>
     ) => {
         if (e.key === "Enter") {
-            e.preventDefault(); // Prevent form submission / line break
+            e.preventDefault(); // Prevent form submission or line break
             const newCategory = categoryInput.trim();
-            if (newCategory.length > 0 && !categories.includes(newCategory)) {
-                setCategories((prev) => [...prev, newCategory]);
+            if (newCategory && newCategory !== selectedCategory) {
+                setSelectedCategory(newCategory);
             }
             setCategoryInput("");
         }
     };
 
-    // ? Remove category (optional)
-    const removeCategory = (cat: string) => {
-        setCategories((prev) => prev.filter((c) => c !== cat));
-    };
+    // // ? Remove category (optional)
+    // const removeCategory = (cat: string) => {
+    //     setCategories((prev) => prev.filter((c) => c !== cat));
+    // };
 
     // ? on Submit function - captures title of task, description, date-time, category. Prints on console.
     const addTask = () => {
         console.log("New Task:", addNewTaskInputValue);
         console.log("Description:", description);
         console.log("Date/Time:", dateTime);
-        console.log("Categories:", categories);
+        console.log("Categories:", selectedCategory);
         // Reset fields
         setAddNewTaskInputValue("");
         setDescription("");
         setDateTime("");
-        setCategories([]);
+        setSelectedCategory("");
         setCategoryInput("");
         setIsFocused(false);
 
@@ -107,64 +110,17 @@ function TodoSection() {
         }
     };
 
-    // Sample tasks list
-    const [tasks, setTasks] = useState([
-        {
-            id: 1,
-            title: "Morning Meeting",
-            time: "08:00 AM",
-            isCompleted: false,
-        },
-        { id: 2, title: "Design Draft", time: "09:30 AM", isCompleted: true },
-        { id: 3, title: "Code Review", time: "10:00 AM", isCompleted: false },
-        { id: 4, title: "Client Call", time: "10:30 AM", isCompleted: true },
-        {
-            id: 5,
-            title: "Email Follow-Up",
-            time: "11:00 AM",
-            isCompleted: false,
-        },
-        { id: 6, title: "Lunch Break", time: "12:00 PM", isCompleted: false },
-        {
-            id: 7,
-            title: "Project Planning",
-            time: "01:00 PM",
-            isCompleted: true,
-        },
-        { id: 8, title: "UI Mockups", time: "01:45 PM", isCompleted: false },
-        {
-            id: 9,
-            title: "Backend Refactor",
-            time: "02:30 PM",
-            isCompleted: true,
-        },
-        {
-            id: 10,
-            title: "Database Update",
-            time: "03:00 PM",
-            isCompleted: false,
-        },
-        { id: 11, title: "Team Standup", time: "03:30 PM", isCompleted: true },
-        {
-            id: 12,
-            title: "API Integration",
-            time: "04:00 PM",
-            isCompleted: false,
-        },
-        {
-            id: 13,
-            title: "Write Documentation",
-            time: "04:30 PM",
-            isCompleted: false,
-        },
-    ]);
+    // ? Sample todos from todos.ts
+    // Initialize state with your todos array
+    const [todos, setTodos] = useState(initialTodos);
 
+    // Toggle the isCompleted state for the selected todo
     const toggleComplete = (id: number) => {
-        setTasks((prev) =>
-            prev.map((task) =>
-                task.id === id
-                    ? { ...task, isCompleted: !task.isCompleted }
-                    : task
+        setTodos((prev) =>
+            prev.map((todo) =>
+                todo.id === id
+                    ? { ...todo, isCompleted: !todo.isCompleted }
+                    : todo
             )
         );
     };
@@ -182,7 +138,9 @@ function TodoSection() {
                         {optionsDropdown ? (
                             <span className="material-icons">close</span>
                         ) : (
-                            <span className="material-icons">more_vert</span>
+                            <span className="material-icons-outlined">
+                                menu
+                            </span>
                         )}
                     </button>
                 </div>
@@ -190,15 +148,6 @@ function TodoSection() {
                 {/* Options Dropdown */}
                 {optionsDropdown && (
                     <div className="w-full flex flex-col transition-all duration-300 border-b-2">
-                        <a
-                            onClick={() => alert("option1 clicked")}
-                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center"
-                        >
-                            Show categories
-                            <span className="text-sm font-bold text-green-600">
-                                ON
-                            </span>
-                        </a>
                         <a
                             onClick={() => alert("option2 clicked")}
                             className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center"
@@ -219,11 +168,32 @@ function TodoSection() {
                                 OFF
                             </span>
                         </a>
+
+                        <a
+                            onClick={() => alert("option1 clicked")}
+                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center"
+                        >
+                            Show categories
+                            <span className="text-sm font-bold text-green-600">
+                                ON
+                            </span>
+                        </a>
                         <a
                             onClick={() =>
                                 alert("Show completed tasks clicked")
                             }
-                            className="p-2 px-4 cursor-pointer hover:ps-6 hover:text-red-900 hover:bg-red-300 duration-200"
+                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center "
+                        >
+                            Categories
+                            <span className="material-icons text-sm text-gray-400">
+                                east
+                            </span>
+                        </a>
+                        <a
+                            onClick={() =>
+                                alert("Show completed tasks clicked")
+                            }
+                            className="p-2 mt-1 px-4 cursor-pointer hover:ps-6 hover:text-red-900 hover:bg-red-300 duration-200"
                         >
                             Delete all tasks
                         </a>
@@ -234,15 +204,21 @@ function TodoSection() {
             {/* // ? Sample tasks placeholder */}
 
             <div className="flex-1 pb-10 ">
-                {tasks.map((task) => (
-                    <TodoCard
-                        key={task.id}
-                        title={task.title}
-                        time={task.time}
-                        isCompleted={task.isCompleted}
-                        onToggleComplete={() => toggleComplete(task.id)}
-                    />
-                ))}
+                {todos.length > 0 ? (
+                    todos.map((todo) => (
+                        <TodoCard
+                            key={todo.id}
+                            title={todo.title}
+                            time={todo.time}
+                            description={todo.description}
+                            isCompleted={todo.isCompleted}
+                            category={todo.category}
+                            onToggleComplete={() => toggleComplete(todo.id)}
+                        />
+                    ))
+                ) : (
+                    <div className="p-4 text-gray-500">No tasks yet</div>
+                )}
             </div>
 
             {/* // ? Conditional description and date-time picker: visible when textfield is focused */}
@@ -273,11 +249,15 @@ function TodoSection() {
 
                     {/* // ? Categories */}
                     {/* Display existing category pills */}
-                    <div className="px-2 flex gap-1 flex-wrap">
-                        {categories.map((cat, idx) => (
-                            <CategoryPill key={idx} label={cat} />
-                        ))}
-                    </div>
+                    {selectedCategory && (
+                        <div className="px-2 flex gap-1 flex-wrap">
+                            <CategoryPill
+                                label={selectedCategory}
+                                deletable={true}
+                                onClick={() => setSelectedCategory("")}
+                            />
+                        </div>
+                    )}
                     <div className="flex px-2 gap-2 items-center">
                         <span
                             className="material-icons text-gray-500"

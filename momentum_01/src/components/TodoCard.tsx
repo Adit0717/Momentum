@@ -2,20 +2,32 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import CategoryPill from "./CategoryPill";
+import TodoDialogBox from "./TodoDialogBox";
 
 interface TodoCardProps {
     title: string;
-    time: string; // e.g., "09:00 AM"
-    isCompleted: boolean;
+    time?: string;
+    description?: string;
+    category?: string;
+    isCompleted?: boolean;
     onToggleComplete?: () => void;
 }
 
 export default function TodoCard({
     title,
     time,
+    description,
+    category,
     isCompleted,
     onToggleComplete,
 }: TodoCardProps) {
+    // ? onClick open dialog box
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    const handleCardClick = () => {
+        setDialogOpen(true);
+    };
+
     // ? Context menu (view and delete)
     const [menuOpen, setMenuOpen] = useState(false);
     const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
@@ -95,9 +107,9 @@ export default function TodoCard({
             ref={cardRef}
             className="relative"
             onContextMenu={handleContextMenu} // ? listening for right click
-            // onClick={handleCloseMenu} // ? clicking anywhere on the card closes the menu
+            onClick={handleCardClick} // ? open dialog box on click on card
         >
-            <div className="flex flex-col justify-between px-4 py-3 bg-white hover:bg-gray-100 gap-2">
+            <div className="flex flex-col justify-between px-4 py-3 bg-white hover:bg-gray-100 gap-2 transition duration-150">
                 {/* Left Section: Checkbox + Title */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -121,15 +133,28 @@ export default function TodoCard({
                     {/* Right Section: Time */}
                     <div className="text-sm text-gray-600">{time}</div>
                 </div>
-                <div className="ps-7 text-sm w-full text-gray-500">
-                    Meeting with Jack, Kayla, Sumita
-                </div>
-                <div className="ps-7 flex flex-wrap gap-1 text-sm">
-                    <CategoryPill label="Category #1" />
-                    <CategoryPill label="Category #2" />
-                    <CategoryPill label="Category #3" />
-                </div>
+                {description && (
+                    <div className="ps-7 text-sm w-full text-gray-500">
+                        {description}
+                    </div>
+                )}
+                {category && (
+                    <div className="ps-7 flex flex-wrap gap-1 text-sm">
+                        <CategoryPill label={category} deletable={false} />
+                    </div>
+                )}
             </div>
+
+            {/* // ? Dialog box */}
+            {dialogOpen && (
+                <TodoDialogBox
+                    title={title}
+                    description={description}
+                    category={category}
+                    time={time}
+                    onClose={() => setDialogOpen(false)}
+                />
+            )}
 
             {/* Context Menu */}
             {menuOpen && (
