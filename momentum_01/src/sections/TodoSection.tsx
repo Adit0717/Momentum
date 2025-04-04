@@ -277,7 +277,8 @@ function TodoSection() {
                 </div>
             )}
             {/* // ? Bottom add new task textfield*/}
-            <div className="bg-black flex sticky bottom-0 z-10">
+
+            <div className="bg-black flex sticky bottom-0 z-10 ">
                 <input
                     onChange={handleChange}
                     onFocus={handleFocus}
