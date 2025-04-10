@@ -243,7 +243,7 @@ function TodoSection() {
                             type="datetime-local"
                             value={dateTime}
                             onChange={handleDateTimeChange}
-                            className=" py-2 focus:outline-none focus:ring-0 text-sm"
+                            className="p-2 focus:outline-none focus:ring-0 "
                         />
                     </div>
 

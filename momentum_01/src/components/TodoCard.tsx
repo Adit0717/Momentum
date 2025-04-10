@@ -107,18 +107,26 @@ export default function TodoCard({
             ref={cardRef}
             className="relative"
             onContextMenu={handleContextMenu} // ? listening for right click
-            onClick={handleCardClick} // ? open dialog box on click on card
         >
-            <div className="flex flex-col justify-between px-4 py-3 bg-white hover:bg-gray-100 gap-2 transition duration-150">
-                {/* Left Section: Checkbox + Title */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            checked={isCompleted}
-                            onChange={onToggleComplete}
-                            className="w-5 h-5 accent-blue-500"
-                        />
+            {/* Left Section: Checkbox + Title */}
+            <div className="flex items-start justify-between hover:bg-gray-100 gap-2 transition duration-150">
+                <div className="flex items-center ps-4 pt-5">
+                    <input
+                        type="checkbox"
+                        checked={isCompleted}
+                        onChange={(e) => {
+                            e.stopPropagation(); // Prevent parent onClick from firing
+                            onToggleComplete && onToggleComplete();
+                            console.log("TodoCard checkbox clicked");
+                        }}
+                        className="w-5 h-5 accent-blue-500"
+                    />
+                </div>
+                <div
+                    className=" flex flex-col w-full gap-1 py-4 ps-2 pe-4"
+                    onClick={handleCardClick} // ? open dialog box on click on card
+                >
+                    <div className="flex justify-between w-full items-center">
                         <span
                             className={`text-lg ${
                                 isCompleted
@@ -128,21 +136,21 @@ export default function TodoCard({
                         >
                             {title}
                         </span>
-                    </div>
 
-                    {/* Right Section: Time */}
-                    <div className="text-sm text-gray-600">{time}</div>
+                        {/* Right Section: Time */}
+                        <div className="text-sm text-gray-600">{time}</div>
+                    </div>
+                    {description && (
+                        <div className="text-sm w-full text-gray-500">
+                            {description}
+                        </div>
+                    )}
+                    {category && (
+                        <div className="flex flex-wrap mt-1 text-sm">
+                            <CategoryPill label={category} deletable={false} />
+                        </div>
+                    )}
                 </div>
-                {description && (
-                    <div className="ps-7 text-sm w-full text-gray-500">
-                        {description}
-                    </div>
-                )}
-                {category && (
-                    <div className="ps-7 flex flex-wrap gap-1 text-sm">
-                        <CategoryPill label={category} deletable={false} />
-                    </div>
-                )}
             </div>
 
             {/* // ? Dialog box */}

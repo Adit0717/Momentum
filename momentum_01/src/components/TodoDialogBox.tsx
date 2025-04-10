@@ -95,34 +95,36 @@ export default function TodoDialogBox({
         >
             <div
                 ref={dialogRef}
-                className={`bg-white p-6 transform transition-transform duration-200 ease-in-out ${
+                className={`bg-white  transform transition-transform duration-200 ease-in-out ${
                     isVisible ? "scale-100" : "scale-105"
                 }`}
                 style={{ width: "550px" }}
             >
-                <input
-                    type="text"
-                    className="text-2xl font-bold mb-3  border-white border-b pb-2 w-full focus:border-b focus:border-b-gray-600 focus:outline-none"
-                    value={localTitle}
-                    onChange={(e) => setLocalTitle(e.target.value)}
-                />
+                <div className="flex flex-col p-6">
+                    <input
+                        type="text"
+                        className="text-2xl font-bold mb-3  border-white border-b pb-2 w-full focus:border-b focus:border-b-gray-600 focus:outline-none"
+                        value={localTitle}
+                        onChange={(e) => setLocalTitle(e.target.value)}
+                    />
 
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="text-gray-600">Time: {time}</div>
-                    <CategoryPill
-                        label={category ?? "No Category"}
-                        deletable={true}
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="text-gray-600">Time: {time}</div>
+                        <CategoryPill
+                            label={category ?? "No Category"}
+                            deletable={true}
+                        />
+                    </div>
+                    <TextareaAutosize
+                        className="text-gray-700 w-full border-white border-t pt-2 focus:border-t focus:border-black fo focus:outline-none"
+                        minRows={10}
+                        maxRows={26}
+                        placeholder="Description"
+                        value={localDescription}
+                        onChange={(e) => setLocalDescription(e.target.value)}
                     />
                 </div>
-                <TextareaAutosize
-                    className="text-gray-700 mb-4 w-full border-white border-b pb-2 focus:border-b focus:border-black focus:border-b-gray-60 focus:outline-none"
-                    minRows={1}
-                    maxRows={16}
-                    placeholder="Description"
-                    value={localDescription}
-                    onChange={(e) => setLocalDescription(e.target.value)}
-                />
-                <div className="flex justify-between">
+                <div className="flex justify-between p-3 border-t-1 border-t-gray-400">
                     <button
                         onClick={() => {
                             console.log(`Delete: ${title}`);
