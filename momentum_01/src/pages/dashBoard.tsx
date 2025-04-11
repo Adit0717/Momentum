@@ -8,7 +8,14 @@ import { useState } from "react";
 import Image from "next/image";
 import TodoSection from "@/sections/TodoSection";
 
+import UserProfilePanel from "@/sections/UserProfilePanel";
+
 function DashBoard() {
+    const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
+
+    const handleAvatarClick = () => {
+        setIsUserProfileOpen(true);
+    };
     return (
         <div className=" h-screen w-screen flex gap-4 p-5">
             {/* // ? Right top button */}
@@ -25,10 +32,14 @@ function DashBoard() {
                     width={50}
                     height={50}
                     className="rounded-full border-2 border-black p-0.5"
-                    onClick={() => {
-                        // todo: User profile Dialogbox slides in logic goes here
-                    }}
+                    onClick={handleAvatarClick}
                 />
+                {/* // ? Render the side user profile panel */}
+                <UserProfilePanel
+                    isOpen={isUserProfileOpen}
+                    onClose={() => setIsUserProfileOpen(false)}
+                />
+
                 <button
                     style={{ width: "50px", height: "50px" }}
                     className="rounded-full flex border-2 border-black justify-center items-center hover:bg-black duration-200"
