@@ -39,7 +39,7 @@ export default function UserProfilePanel({
             {/* Backdrop */}
             {isOpen && (
                 <div
-                    className="fixed inset-0  bg-opacity-30 z-40"
+                    className="fixed inset-0 bg-opacity-30 z-40"
                     style={{ backgroundColor: "#00000040" }}
                 ></div>
             )}
@@ -51,7 +51,7 @@ export default function UserProfilePanel({
                 style={{ minWidth: "400px", maxWidth: "400px" }}
             >
                 <div className="flex items-center justify-between w-full">
-                    <div className="text-sm p-4">User Profile</div>
+                    <div className="text-sm p-4">USER PROFILE</div>
 
                     <button
                         onClick={onClose}
@@ -76,19 +76,19 @@ export default function UserProfilePanel({
                     className="flex items-center px-4 py-2 w-full cursor-pointer  hover:bg-gray-200 hover:ps-6 duration-200 "
                 >
                     <div className="text-sm text-gray-500 w-1/4">Email</div>
-                    <div className="flex-1 ">fernandezjo1@gmail.com</div>
+                    <div className="flex-1">fernandezjo1@gmail.com</div>
                 </div>
                 <div
                     onClick={() => alert("Logout clicked!")}
                     className="flex items-center px-4 py-2 w-full cursor-pointer  hover:bg-gray-200 hover:ps-6 duration-200 "
                 >
                     <div className="text-sm text-gray-500 w-1/4">Password</div>
-                    <div className="flex-1 ">••••••••</div>
+                    <div className="flex-1">••••••••</div>
                 </div>
 
                 <div
                     onClick={() => alert("Logout clicked!")}
-                    className="flex item-center justify-between p-4 w-full bg-red-100 cursor-pointer hover:text-red-900 hover:bg-red-300 hover:ps-6 duration-200 "
+                    className="flex item-center justify-between p-4 w-full bg-red-100 cursor-pointer hover:text-red-900 hover:bg-red-300 hover:ps-6 duration-200"
                 >
                     Logout
                     <span className="material-icons">logout</span>
