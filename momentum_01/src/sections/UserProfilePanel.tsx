@@ -7,6 +7,7 @@ import TempUserAvatar from "../../public/temp-user-avatar.png";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import useUserProfile from "@/hooks/useUserProfiles";
 
 interface UserProfilePanelProps {
     isOpen: boolean;
@@ -21,6 +22,8 @@ export default function UserProfilePanel({
     const [user, setUser] = useState<any>(null);
     const [loggingOut, setLoggingOut] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
+
+    const { profile, loading, error } = useUserProfile();
 
     // ? Fetch & guard current user whenever the panel opens
     useEffect(() => {
@@ -60,6 +63,7 @@ export default function UserProfilePanel({
         setTimeout(async () => {
             const { error } = await supabase.auth.signOut();
             if (!error) {
+                onClose();
                 router.replace("/auth");
             } else {
                 console.error("Logout failed:", error.message);
@@ -109,9 +113,6 @@ export default function UserProfilePanel({
                             </div>
                         ) : (
                             <div className="text-sm ps-4 pe-3 h-[50] flex w-fit items-center ">
-                                {/* <span className="material-icons">
-                                    chevron_left
-                                </span> */}
                                 USER PROFILE
                             </div>
                         )}
@@ -185,15 +186,19 @@ export default function UserProfilePanel({
                             <div className="p-4 flex items-center gap-2.5 hover:bg-gray-200 cursor-pointer w-full">
                                 {/* Profile content here, e.g. avatar, name, email, etc. */}
                                 <Image
-                                    src={TempUserAvatar}
+                                    src={profile?.avatar_url ?? TempUserAvatar}
                                     alt="user avatar"
                                     width={70}
                                     height={70}
                                     className="rounded-full border border-black hover:bg-amber-300"
                                 />
                                 <div className="text-2xl font-medium">
-                                    {/* {user.name} */}
-                                    [user.name]
+                                    {/* //? fetch full_name */}
+                                    {/* <ProfileField
+                                        field="full_name"
+                                        placeholder="— no name —"
+                                    /> */}
+                                    {profile?.full_name}
                                 </div>
                             </div>
                             <div

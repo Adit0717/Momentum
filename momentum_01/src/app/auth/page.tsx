@@ -34,18 +34,45 @@ export default function AuthPage() {
         setLoading(true);
         setError(null);
 
-        const { data, error: supaErr } = await supabase.auth.signInWithPassword(
-            {
+        const { data: sessionData, error: signInErr } =
+            await supabase.auth.signInWithPassword({
                 email: signInEmail,
                 password: signInPassword,
-            }
-        );
+            });
 
-        if (supaErr) {
-            setError(supaErr.message);
-        } else {
-            router.push("/dashboard"); // or wherever
+        if (signInErr) {
+            setError(signInErr.message);
+            setLoading(false);
+            return;
         }
+
+        // user is now fully authenticated, so RLS will allow us to insert…
+        // * if user is new, then insert user data in public/profiles
+        const user = sessionData.user;
+        const pendingName = window.localStorage.getItem("pendingName");
+        const pendingEmail = window.localStorage.getItem("pendingEmail");
+
+        if (user && pendingName && pendingEmail) {
+            const { error: profileErr } = await supabase
+                .from("profiles")
+                .insert({
+                    user_id: user.id,
+                    full_name: pendingName,
+                    email: pendingEmail,
+                    avatar_url: "https://i.postimg.cc/placeholder/avatar.png",
+                });
+
+            if (profileErr) {
+                console.error("could not insert profile:", profileErr);
+                // you can choose to show a warning but still continue
+            } else {
+                // clear your “pending” data
+                window.localStorage.removeItem("pendingName");
+                window.localStorage.removeItem("pendingEmail");
+            }
+        }
+
+        router.push("/dashboard");
         setLoading(false);
     };
 
@@ -54,7 +81,7 @@ export default function AuthPage() {
         setLoading(true);
         setError(null);
 
-        // 1) Create the auth user
+        // Create the entry in auth/users
         const { data: signUpData, error: signUpErr } =
             await supabase.auth.signUp({
                 email: signUpEmail,
@@ -67,29 +94,13 @@ export default function AuthPage() {
             return;
         }
 
-        // 2) Now insert into profiles. user_id will default to auth.uid()
-        const userId = signUpData.user?.id!;
-        const { error: profileErr } = await supabase.from("profiles").insert([
-            {
-                user_id: userId,
-                email: signUpEmail,
-                full_name: signUpName,
-                avatar_url: "https://i.postimg.cc/placeholder/avatar.png",
-            },
-        ]);
+        // stash their name & email so that we can insert to profiles later
+        window.localStorage.setItem("pendingName", signUpName);
+        window.localStorage.setItem("pendingEmail", signUpEmail);
 
-        if (profileErr) {
-            console.error("Could not insert profile:", profileErr);
-            setError(profileErr.message);
-            setLoading(false);
-            return;
-        }
-
-        // 3) Success → clear form & redirect
-        setSignUpName("");
-        setSignUpEmail("");
-        setSignUpPassword("");
+        // send to verify email screen
         router.push("/verify");
+
         setLoading(false);
     };
 
