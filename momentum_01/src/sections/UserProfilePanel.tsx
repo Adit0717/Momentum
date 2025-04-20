@@ -5,6 +5,8 @@ import React, { useEffect, useRef, useState } from "react";
 import "material-icons/iconfont/material-icons.css";
 import TempUserAvatar from "../../public/temp-user-avatar.png";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 interface UserProfilePanelProps {
     isOpen: boolean;
@@ -15,7 +17,24 @@ export default function UserProfilePanel({
     isOpen,
     onClose,
 }: UserProfilePanelProps) {
+    const router = useRouter();
+    const [user, setUser] = useState<any>(null);
+    const [loggingOut, setLoggingOut] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
+
+    // ? Fetch & guard current user whenever the panel opens
+    useEffect(() => {
+        if (!isOpen) return;
+
+        supabase.auth.getUser().then(({ data, error }) => {
+            if (error || !data.user) {
+                // Not signed in, or error fetching user → send them back to /auth
+                router.replace("/auth");
+            } else {
+                setUser(data.user);
+            }
+        });
+    }, [isOpen, router]);
 
     // Close on outside click
     useEffect(() => {
@@ -34,11 +53,28 @@ export default function UserProfilePanel({
         };
     }, [isOpen, onClose]);
 
+    // ? Handling Logout
+    const handleLogout = async () => {
+        setLoggingOut(true);
+
+        setTimeout(async () => {
+            const { error } = await supabase.auth.signOut();
+            if (!error) {
+                router.replace("/auth");
+            } else {
+                console.error("Logout failed:", error.message);
+                setLoggingOut(false);
+            }
+        }, 800);
+    };
+
     const [updatePasswordView, setUpdatePasswordView] = useState(false);
 
     const toggleUpdatePasswordView = () => {
         setUpdatePasswordView((prev) => !prev);
     };
+
+    if (!isOpen || !user) return null;
 
     return (
         <>
@@ -156,7 +192,8 @@ export default function UserProfilePanel({
                                     className="rounded-full border border-black hover:bg-amber-300"
                                 />
                                 <div className="text-2xl font-medium">
-                                    Joseph Fernandez
+                                    {/* {user.name} */}
+                                    [user.name]
                                 </div>
                             </div>
                             <div
@@ -166,9 +203,7 @@ export default function UserProfilePanel({
                                 <div className="text-sm text-gray-500 w-1/4">
                                     Email
                                 </div>
-                                <div className="flex-1 ">
-                                    fernandezjo1@gmail.com
-                                </div>
+                                <div className="flex-1 ">{user.email}</div>
                             </div>
                             <div
                                 onClick={toggleUpdatePasswordView}
@@ -180,13 +215,22 @@ export default function UserProfilePanel({
                                 <div className="flex-1 ">••••••••</div>
                             </div>
 
-                            <div
-                                onClick={() => alert("Logout clicked!")}
+                            <button
+                                onClick={handleLogout}
+                                disabled={loggingOut}
                                 className="flex item-center justify-between p-4 w-full bg-red-100 cursor-pointer hover:text-red-900 hover:bg-red-300 hover:ps-6 duration-200 "
                             >
-                                Logout
-                                <span className="material-icons">logout</span>
-                            </div>
+                                {loggingOut ? (
+                                    <>
+                                        <span className="material-icons animate-spin text-lg">
+                                            loop
+                                        </span>
+                                        <span>Logging you out…</span>
+                                    </>
+                                ) : (
+                                    "Log out"
+                                )}
+                            </button>
                         </>
                     )}
                 </div>

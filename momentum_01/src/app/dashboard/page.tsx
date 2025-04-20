@@ -1,7 +1,7 @@
 "use client";
-import TempUserAvatar from "../../public/temp-user-avatar.png";
-import FocusIconLight from "../../public/focus-icon-light.svg";
-import FocusIconDark from "../../public/focus-icon-dark.svg";
+import TempUserAvatar from "../../../public/temp-user-avatar.png";
+import FocusIconLight from "../../../public/focus-icon-light.svg";
+import FocusIconDark from "../../../public/focus-icon-dark.svg";
 
 import IconButton from "@/components/IconButton";
 import { useState } from "react";
