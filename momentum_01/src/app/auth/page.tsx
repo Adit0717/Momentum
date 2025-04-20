@@ -59,7 +59,8 @@ export default function AuthPage() {
                     user_id: user.id,
                     full_name: pendingName,
                     email: pendingEmail,
-                    avatar_url: "https://i.postimg.cc/placeholder/avatar.png",
+                    avatar_url:
+                        "https://i.postimg.cc/5tDRKTr6/default-avatar.png",
                 });
 
             if (profileErr) {
