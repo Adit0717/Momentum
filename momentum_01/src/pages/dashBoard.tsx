@@ -43,7 +43,9 @@ function DashBoard() {
                 />
 
                 <button
-                    onClick={() => {setIsFocusMode(prev => !prev)}}
+                    onClick={() => {
+                        setIsFocusMode((prev) => !prev);
+                    }}
                     style={{ width: "50px", height: "50px" }}
                     className="rounded-full flex border-2 border-black justify-center items-center hover:bg-black duration-200"
                 >
@@ -52,17 +54,17 @@ function DashBoard() {
             </div>
 
             {!isFocusMode && (
-            <div
-                className="border border-gray-300 h-full overflow-hidden "
-                style={{ minWidth: "400px", maxWidth: "400px" }}
-            >
-                <TodoSection />
-            </div>
+                <div
+                    className="border border-gray-300 h-full overflow-hidden"
+                    style={{ minWidth: "400px", maxWidth: "400px" }}
+                >
+                    <TodoSection />
+                </div>
             )}
 
             {/* Right Section (Focus Mode OR Default Panel) */}
             <div className="border border-gray-300 h-full flex-1 overflow-hidden">
-            {isFocusMode ? <FocusView /> : <div className="p-6">col 2</div>}
+                {isFocusMode ? <FocusView /> : <div className="p-6">col 2</div>}
             </div>
         </div>
     );
