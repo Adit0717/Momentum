@@ -110,10 +110,20 @@ export default function TodoDialogBox({
 
                     <div className="flex items-center gap-3 mb-4">
                         <div className="text-gray-600">Time: {time}</div>
-                        <CategoryPill
-                            label={category ?? "No Category"}
-                            deletable={true}
-                        />
+                        {category ? (
+                            <CategoryPill label={category} deletable={true} />
+                        ) : (
+                            // Todo: Add category function
+                            <CategoryPill
+                                label="+ Add Category"
+                                color="bg-black"
+                                textColor="text-white"
+                                deletable={false}
+                                onClick={() => {
+                                    alert("add category clicked!");
+                                }}
+                            />
+                        )}
                     </div>
                     <TextareaAutosize
                         className="text-gray-700 w-full border-white border-t pt-2 focus:border-t focus:border-black fo focus:outline-none"

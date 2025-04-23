@@ -8,6 +8,7 @@ import React, { use } from "react";
 interface CategoryPillProps {
     label: string;
     color?: string;
+    textColor?: string;
     onClick?: () => void;
     deletable?: boolean;
 }
@@ -15,13 +16,14 @@ interface CategoryPillProps {
 export default function CategoryPill({
     label,
     color = "bg-gray-200",
+    textColor = "text-black",
     onClick,
     deletable = true,
 }: CategoryPillProps) {
     return (
         <button
             onClick={onClick}
-            className={`group inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-black hover:opacity-60 transition-all ${color}`}
+            className={`group inline-flex items-center px-2 py-1 rounded-full text-xs font-medium  hover:opacity-60 transition-all ${color} ${textColor}`}
         >
             <span className="">{label}</span>
             {deletable && (
