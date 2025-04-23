@@ -21,7 +21,7 @@ export default function CategoryPill({
     return (
         <button
             onClick={onClick}
-            className={`group inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-black hover:opacity-80 transition-all ${color}`}
+            className={`group inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-black hover:opacity-60 transition-all ${color}`}
         >
             <span className="">{label}</span>
             {deletable && (

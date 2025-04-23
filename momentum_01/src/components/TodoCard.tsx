@@ -145,11 +145,11 @@ export default function TodoCard({
                             {description}
                         </div>
                     )}
-                    {category && (
-                        <div className="flex flex-wrap mt-1 text-sm">
+                    <div className="flex flex-wrap mt-1 text-sm bg-red-300">
+                        {category && (
                             <CategoryPill label={category} deletable={false} />
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
 
