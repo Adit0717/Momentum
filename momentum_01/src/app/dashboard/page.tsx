@@ -10,6 +10,7 @@ import TodoSection from "@/sections/TodoSection";
 
 import UserProfilePanel from "@/sections/UserProfilePanel";
 import useUserProfile from "@/hooks/useUserProfiles";
+import UserStats from "@/sections/UserStats";
 
 function DashBoard() {
     const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
@@ -57,7 +58,7 @@ function DashBoard() {
                 <TodoSection />
             </div>
 
-            <div className="border border-gray-300 h-full flex-1">col 2</div>
+            <div className="border border-gray-300 h-full flex-1"> <UserStats /> </div>
         </div>
     );
 }

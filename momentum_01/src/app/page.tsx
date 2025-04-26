@@ -4,6 +4,6 @@ import AuthPage from "./auth/page";
 
 export default function Home() {
     // return <HomePage />;
-    return <AuthPage />;
-    // return <DashBoard />;
+    //return <AuthPage />;
+    return <DashBoard />;
 }
