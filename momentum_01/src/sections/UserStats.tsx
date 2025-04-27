@@ -47,10 +47,13 @@ export default function UserStats() {
     <div className="h-full w-full flex flex-col p-6 gap-6">
 
       {/* Header: My Stats + Date */}
-      <div className="flex justify-between items-center pr-24">
-        <h2 className="text-2xl font-light">My Stats</h2>
-        <span className="text-gray-500 text-sm">{getFormattedDate()}</span>
+      <div className="flex items-center justify-between pr-36 relative">
+      <h2 className="text-2xl font-light">My Stats</h2>
+
+      <div className="absolute right-12 bg-gray-100 text-gray-700 px-4 py-1 rounded-full text-sm shadow-sm min-w-[150px] text-center">
+        {getFormattedDate()}
       </div>
+    </div>
 
       {/* Heatmap */}
       <div className="overflow-auto mb-8">
