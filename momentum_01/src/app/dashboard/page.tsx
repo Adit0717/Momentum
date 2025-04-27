@@ -1,14 +1,23 @@
 "use client";
-import TempUserAvatar from "../../public/temp-user-avatar.png";
-import FocusIconLight from "../../public/focus-icon-light.svg";
-import FocusIconDark from "../../public/focus-icon-dark.svg";
+import TempUserAvatar from "../../../public/temp-user-avatar.png";
+import FocusIconLight from "../../../public/focus-icon-light.svg";
+import FocusIconDark from "../../../public/focus-icon-dark.svg";
 
 import IconButton from "@/components/IconButton";
 import { useState } from "react";
 import Image from "next/image";
 import TodoSection from "@/sections/TodoSection";
 
+import UserProfilePanel from "@/sections/UserProfilePanel";
+import useUserProfile from "@/hooks/useUserProfiles";
+
 function DashBoard() {
+    const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
+    const { profile, loading, error } = useUserProfile();
+
+    const handleAvatarClick = () => {
+        setIsUserProfileOpen(true);
+    };
     return (
         <div className=" h-screen w-screen flex gap-4 p-5">
             {/* // ? Right top button */}
@@ -20,15 +29,19 @@ function DashBoard() {
             >
                 {/* // ? User avatar button */}
                 <Image
-                    src={TempUserAvatar}
+                    src={profile?.avatar_url ?? TempUserAvatar}
                     alt="user avatar"
                     width={50}
                     height={50}
-                    className="rounded-full border-2 border-black p-0.5"
-                    onClick={() => {
-                        // todo: User profile Dialogbox slides in logic goes here
-                    }}
+                    className="rounded-full "
+                    onClick={handleAvatarClick}
                 />
+                {/* // ? Render the side user profile panel */}
+                <UserProfilePanel
+                    isOpen={isUserProfileOpen}
+                    onClose={() => setIsUserProfileOpen(false)}
+                />
+
                 <button
                     style={{ width: "50px", height: "50px" }}
                     className="rounded-full flex border-2 border-black justify-center items-center hover:bg-black duration-200"

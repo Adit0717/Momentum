@@ -13,29 +13,16 @@ import { todos as initialTodos } from "@/data/todos";
 import "material-icons/iconfont/material-icons.css";
 import { useEffect, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
+import CategoriesDialogBox from "@/sections/CategoriesDialogBox";
 
 function TodoSection() {
+    const [isCategoriesDialogOpen, setIsCategoriesDialogOpen] = useState(false);
     const [optionsDropdown, setOptionsDropdown] = useState(false);
     const headerRef = useRef<HTMLDivElement>(null);
 
     const toggleDropdown = () => {
         setOptionsDropdown((prev) => !prev);
     };
-
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (
-                headerRef.current &&
-                !headerRef.current.contains(event.target as Node)
-            ) {
-                setOptionsDropdown(false);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [headerRef]);
 
     // ? for bottom add new task
     const [addNewTaskInputValue, setAddNewTaskInputValue] = useState("");
@@ -110,6 +97,11 @@ function TodoSection() {
         }
     };
 
+    // ? Handle CategoriesDialogBox
+    const openCategoriesDialog = () => {
+        setIsCategoriesDialogOpen(true);
+    };
+
     // ? Sample todos from todos.ts
     // Initialize state with your todos array
     const [todos, setTodos] = useState(initialTodos);
@@ -179,16 +171,15 @@ function TodoSection() {
                             </span>
                         </a>
                         <a
-                            onClick={() =>
-                                alert("Show completed tasks clicked")
-                            }
+                            onClick={openCategoriesDialog}
                             className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center "
                         >
-                            Categories
+                            Manage Categories
                             <span className="material-icons text-sm text-gray-400">
                                 east
                             </span>
                         </a>
+
                         <a
                             onClick={() =>
                                 alert("Show completed tasks clicked")
@@ -302,6 +293,10 @@ function TodoSection() {
                     <span className="material-icons text-white">add</span>
                 </button>
             </div>
+            <CategoriesDialogBox
+                isOpen={isCategoriesDialogOpen}
+                onClose={() => setIsCategoriesDialogOpen(false)}
+            />
         </div>
     );
 }
