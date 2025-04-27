@@ -5,30 +5,22 @@ import { scaleLinear } from "@visx/scale";
 import { TooltipWithBounds, useTooltip, defaultStyles } from "@visx/tooltip";
 import { localPoint } from "@visx/event";
 
-interface DayBin {
-  date: number;
+interface HeatmapDay {
+  date: string; // ISO format "2025-04-01"
   count: number;
-}
-
-interface MonthBin {
-  month: string;
-  bins: DayBin[];
 }
 
 interface Props {
   width: number;
   height: number;
-  data: MonthBin[];
+  data: HeatmapDay[];
 }
 
 export default function CalendarHeatmap({ width, height, data }: Props) {
-  const barWidth = 20;
-  const barHeight = 30;
-  const gutter = 4;
+  const squareSize = 20;
+  const gutter = 5;
 
-  const maxCount = Math.max(
-    ...data.flatMap((month) => month.bins.map((bin) => bin.count))
-  );
+  const maxCount = Math.max(...data.map((d) => d.count));
 
   const colorScale = useMemo(
     () =>
@@ -46,45 +38,49 @@ export default function CalendarHeatmap({ width, height, data }: Props) {
     tooltipOpen,
     showTooltip,
     hideTooltip,
-  } = useTooltip<{ date: number; month: string; count: number }>();
+  } = useTooltip<HeatmapDay>();
+
+  // Map date to (weekIndex, dayIndex)
+  const getWeekAndDay = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const dayOfWeek = date.getDay(); // Sunday = 0, Saturday = 6
+
+    // Find the week index since start of the month
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const diffInDays = Math.floor(
+      (date.getTime() - startOfMonth.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    const weekIndex = Math.floor((diffInDays + startOfMonth.getDay()) / 7);
+
+    return { week: weekIndex, day: dayOfWeek };
+  };
 
   return (
     <div className="relative">
       <svg width={width} height={height}>
-        {data.map((month, rowIdx) => (
-          <g key={month.month}>
-            {/* Month Label */}
-            <text
-              x={0}
-              y={rowIdx * (barHeight + gutter) - 6}
-              className="text-sm fill-gray-700"
-            >
-              {month.month}
-            </text>
-
-            {/* Bars */}
-            {month.bins.map((bin, colIdx) => (
-              <rect
-                key={`${month.month}-${bin.date}`}
-                x={colIdx * (barWidth + gutter) + 60}
-                y={rowIdx * (barHeight + gutter)}
-                width={barWidth}
-                height={barHeight}
-                rx={4}
-                fill={colorScale(bin.count)}
-                onMouseMove={(e) => {
-                  const coords = localPoint(e);
-                  showTooltip({
-                    tooltipLeft: coords?.x,
-                    tooltipTop: coords?.y,
-                    tooltipData: { ...bin, month: month.month },
-                  });
-                }}
-                onMouseLeave={hideTooltip}
-              />
-            ))}
-          </g>
-        ))}
+        {data.map((day, idx) => {
+          const { week, day: dayIdx } = getWeekAndDay(day.date);
+          return (
+            <rect
+              key={day.date}
+              x={week * (squareSize + gutter)}
+              y={dayIdx * (squareSize + gutter)}
+              width={squareSize}
+              height={squareSize}
+              rx={4}
+              fill={colorScale(day.count)}
+              onMouseMove={(e) => {
+                const coords = localPoint(e);
+                showTooltip({
+                  tooltipLeft: coords?.x,
+                  tooltipTop: coords?.y,
+                  tooltipData: day,
+                });
+              }}
+              onMouseLeave={hideTooltip}
+            />
+          );
+        })}
       </svg>
 
       {tooltipOpen && tooltipData && (
@@ -93,7 +89,12 @@ export default function CalendarHeatmap({ width, height, data }: Props) {
           left={tooltipLeft}
           style={{ ...defaultStyles, backgroundColor: "black", color: "white" }}
         >
-          {tooltipData.month} {tooltipData.date}: {tooltipData.count} tasks
+          {new Date(tooltipData.date).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          })}
+          : {tooltipData.count} tasks
         </TooltipWithBounds>
       )}
     </div>

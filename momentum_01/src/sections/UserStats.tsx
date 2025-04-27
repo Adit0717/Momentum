@@ -1,9 +1,15 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import CalendarHeatmap from "@/components/CalendarHeatMap";
-import { useMemo } from "react";
 
-// Helper to format current date
+// Type for new format (day-by-day)
+type DayData = {
+  date: string; // full date like "2025-04-26"
+  count: number;
+};
+
+// Helper: Format current date for header
 function getFormattedDate() {
   return new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -13,18 +19,24 @@ function getFormattedDate() {
 }
 
 export default function UserStats() {
-  const heatmapData = useMemo(() => {
-    const months = ["February", "March"];
-    return months.map((month, mi) => {
-      const days = mi === 0 ? 28 : 31;
+  const [heatmapData, setHeatmapData] = useState<DayData[]>([]);
+
+  useEffect(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+
+    const numDays = new Date(year, month + 1, 0).getDate();
+
+    const data = Array.from({ length: numDays }, (_, idx) => {
+      const date = new Date(year, month, idx + 1);
       return {
-        month,
-        bins: Array.from({ length: days }, (_, d) => ({
-          date: d + 1,
-          count: Math.floor(Math.random() * 10),
-        })),
+        date: date.toISOString().split("T")[0],
+        count: Math.floor(Math.random() * 10),
       };
     });
+
+    setHeatmapData(data);
   }, []);
 
   const completedTasks = 34;
@@ -33,17 +45,18 @@ export default function UserStats() {
 
   return (
     <div className="h-full w-full flex flex-col p-6 gap-6">
-      
+
       {/* Header: My Stats + Date */}
       <div className="flex justify-between items-center pr-24">
-        {/* Push date a bit left by adding pr-24 */}
         <h2 className="text-2xl font-light">My Stats</h2>
         <span className="text-gray-500 text-sm">{getFormattedDate()}</span>
       </div>
 
       {/* Heatmap */}
       <div className="overflow-auto mb-8">
-        <CalendarHeatmap width={600} height={180} data={heatmapData} />
+        <div className="p-2 bg-white rounded-lg shadow">
+          <CalendarHeatmap width={600} height={150} data={heatmapData} />
+        </div>
       </div>
 
       {/* Progress Ring */}
