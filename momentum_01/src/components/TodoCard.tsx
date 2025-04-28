@@ -11,9 +11,9 @@ interface TodoCardProps {
     category?: string;
     isCompleted?: boolean;
     onToggleComplete?: () => void;
+    showDescription?: boolean;
 }
 
-// ✅ Helper function to format ISO timestamps nicely
 const formatDateTime = (isoString: string) => {
     const date = new Date(isoString);
     return date.toLocaleString(undefined, {
@@ -31,6 +31,7 @@ export default function TodoCard({
     category,
     isCompleted,
     onToggleComplete,
+    showDescription,
 }: TodoCardProps) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -98,7 +99,7 @@ export default function TodoCard({
     return (
         <div
             ref={cardRef}
-            className="relative"
+            className="relative transition-all duration-300 ease-in-out"
             onContextMenu={handleContextMenu}
         >
             <div className="flex items-start justify-between hover:bg-gray-100 gap-2 transition duration-150">
@@ -122,9 +123,9 @@ export default function TodoCard({
                         <span
                             className={`text-lg ${
                                 isCompleted
-                                    ? "line-through text-gray-500"
-                                    : "text-black"
-                            }`}
+                                    ? "line-through text-gray-500 opacity-60"
+                                    : "text-black opacity-100"
+                            } `}
                         >
                             {title}
                         </span>
@@ -143,7 +144,7 @@ export default function TodoCard({
                             {formatDateTime(time)}
                         </div>
                     )}
-                    {description && (
+                    {showDescription && description && (
                         <div className="text-sm w-full text-gray-500">
                             {description}
                         </div>

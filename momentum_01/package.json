@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.8.2",
     "@supabase/supabase-js": "^2.49.4",
     "material-icons": "^1.13.14",
     "next": "15.2.3",

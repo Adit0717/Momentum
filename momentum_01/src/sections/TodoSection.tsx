@@ -14,6 +14,7 @@ import "material-icons/iconfont/material-icons.css";
 import { useEffect, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import CategoriesDialogBox from "@/sections/CategoriesDialogBox";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface Task {
@@ -34,6 +35,8 @@ interface Category {
 }
 
 function TodoSection() {
+    const [showDescriptions, setShowDescriptions] = useState(true);
+
     const [isCategoriesDialogOpen, setIsCategoriesDialogOpen] = useState(false);
     const [optionsDropdown, setOptionsDropdown] = useState(false);
     const headerRef = useRef<HTMLDivElement>(null);
@@ -44,6 +47,8 @@ function TodoSection() {
     const [userId, setUserId] = useState<string | null>(null);
 
     const [todos, setTodos] = useState<Task[]>([]);
+
+    const [parent] = useAutoAnimate();
 
     useEffect(() => {
         const fetchUserId = async () => {
@@ -64,7 +69,7 @@ function TodoSection() {
                 .from("tasks")
                 .select("*")
                 .eq("user_id", userId)
-                .order("created_at", { ascending: true });
+                .order("deadline", { ascending: false });
 
             if (error) {
                 console.error("Error fetching tasks:", error.message);
@@ -78,6 +83,10 @@ function TodoSection() {
 
     const toggleDropdown = () => {
         setOptionsDropdown((prev) => !prev);
+    };
+
+    const toggleShowDescriptions = () => {
+        setShowDescriptions((prev) => !prev);
     };
 
     // ? for bottom add new task
@@ -122,7 +131,7 @@ function TodoSection() {
                 setSelectedCategory(existingCategory.cat_name);
             } else {
                 try {
-                    // ✅ Get current user
+                    // Get current user
                     const { data: userData, error: userError } =
                         await supabase.auth.getUser();
 
@@ -143,8 +152,8 @@ function TodoSection() {
                             .insert([
                                 {
                                     cat_name: newCategoryName,
-                                    cat_color: "#d1d5db", // optional: default gray
-                                    user_id: userId, // ✅ Important!
+                                    cat_color: "#d1d5db",
+                                    user_id: userId,
                                 },
                             ])
                             .select()
@@ -205,12 +214,30 @@ function TodoSection() {
     // };
 
     // ? on Submit function - captures title of task, description, date-time, category. Prints on console.
-    const addTask = () => {
-        console.log("New Task:", addNewTaskInputValue);
-        console.log("Description:", description);
-        console.log("Date/Time:", dateTime);
-        console.log("Categories:", selectedCategory);
-        // Reset fields
+    const addTask = async () => {
+        if (!addNewTaskInputValue.trim()) return;
+        if (!userId) return;
+
+        const title = addNewTaskInputValue.trim();
+        const newTaskId = Date.now().toString(); // temporary ID for optimistic update
+        const selectedCategoryId =
+            allCategories.find((cat) => cat.cat_name === selectedCategory)
+                ?.id || null;
+
+        const newTask: Task = {
+            id: newTaskId,
+            title: title,
+            description: description.trim(),
+            completed: false,
+            deadline: dateTime || null,
+            category_id: selectedCategoryId,
+            created_at: new Date().toISOString(),
+        };
+
+        // Local optimistic update
+        setTodos((prev) => [newTask, ...prev]);
+
+        // Reset input fields
         setAddNewTaskInputValue("");
         setDescription("");
         setDateTime("");
@@ -218,7 +245,35 @@ function TodoSection() {
         setCategoryInput("");
         setIsFocused(false);
 
-        // TODO: Implement actual add-task logic
+        // Insert into Supabase
+        const { data, error } = await supabase
+            .from("tasks")
+            .insert([
+                {
+                    title: title,
+                    description: newTask.description,
+                    completed: false,
+                    deadline: newTask.deadline,
+                    category_id: selectedCategoryId,
+                    user_id: userId,
+                },
+            ])
+            .select()
+            .single();
+
+        if (error) {
+            console.error("Error inserting task:", error.message);
+
+            // Rollback: Remove the optimistic task if backend fails
+            setTodos((prev) => prev.filter((task) => task.id !== newTaskId));
+        } else if (data) {
+            // Update local task with real ID from Supabase
+            setTodos((prev) =>
+                prev.map((task) =>
+                    task.id === newTaskId ? { ...task, id: data.id } : task
+                )
+            );
+        }
     };
 
     // ? controlling visiblity of description and date-time picker
@@ -246,34 +301,38 @@ function TodoSection() {
 
     //? Toggle the isCompleted state for the selected todo (optimized - local first and supabase later)
     const toggleComplete = async (id: string) => {
-        // updating the UI first
-        setTodos((prev) =>
-            prev.map((todo) =>
-                todo.id === id ? { ...todo, completed: !todo.completed } : todo
-            )
-        );
+        const task = todos.find((todo) => todo.id === id);
+        if (!task) return;
 
-        // Then attempt Supabase update
         const { error } = await supabase
             .from("tasks")
-            .update({
-                completed:
-                    todos.find((todo) => todo.id === id)?.completed === false,
-            })
+            .update({ completed: !task.completed })
             .eq("id", id);
 
-        // If Supabase fails, rollback
         if (error) {
             console.error("Error updating task completion:", error.message);
-
-            // Rollback the change
-            setTodos((prev) =>
-                prev.map((todo) =>
+        } else {
+            // If update succeeds, update local state with sorting
+            setTodos((prev) => {
+                const updated = prev.map((todo) =>
                     todo.id === id
                         ? { ...todo, completed: !todo.completed }
                         : todo
-                )
-            );
+                );
+
+                // Sort: incomplete first, completed last
+                updated.sort((a, b) => {
+                    if (a.completed === b.completed) {
+                        return (
+                            new Date(a.created_at).getTime() -
+                            new Date(b.created_at).getTime()
+                        );
+                    }
+                    return a.completed ? 1 : -1;
+                });
+
+                return updated;
+            });
         }
     };
 
@@ -301,13 +360,19 @@ function TodoSection() {
                 {optionsDropdown && (
                     <div className="w-full flex flex-col transition-all duration-300 border-b-2">
                         <a
-                            onClick={() => alert("option2 clicked")}
+                            onClick={toggleShowDescriptions}
                             className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center"
                         >
                             Show descriptions
-                            <span className="text-sm font-bold text-green-600">
-                                ON
-                            </span>
+                            {showDescriptions ? (
+                                <span className="text-sm font-bold text-green-600">
+                                    ON
+                                </span>
+                            ) : (
+                                <span className="text-sm font-bold text-red-600">
+                                    OFF
+                                </span>
+                            )}
                         </a>
                         <a
                             onClick={() =>
@@ -354,7 +419,7 @@ function TodoSection() {
 
             {/* // ? Sample tasks placeholder */}
 
-            <div className="flex-1 pb-10 ">
+            <div ref={parent} className="flex-1 pb-10 ">
                 {todos.length > 0 ? (
                     todos.map((todo) => (
                         <TodoCard
@@ -369,6 +434,7 @@ function TodoSection() {
                                 )?.cat_name || ""
                             }
                             onToggleComplete={() => toggleComplete(todo.id)}
+                            showDescription={showDescriptions}
                         />
                     ))
                 ) : (
