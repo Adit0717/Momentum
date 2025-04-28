@@ -28,7 +28,7 @@ export default function CategoryPill({
                 backgroundColor: color || "#e5e7eb",
             }}
         >
-            <span className="">{label}</span>
+            <span className="font-medium">{label}</span>
             {deletable && (
                 <span
                     className="

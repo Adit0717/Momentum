@@ -16,6 +16,16 @@ import TextareaAutosize from "react-textarea-autosize";
 import CategoriesDialogBox from "@/sections/CategoriesDialogBox";
 import { supabase } from "@/lib/supabaseClient";
 
+interface Task {
+    id: string;
+    title: string;
+    description: string;
+    completed: boolean;
+    deadline: string | null;
+    category_id: string | null;
+    created_at: string;
+}
+
 interface Category {
     id: string;
     cat_name: string;
@@ -33,6 +43,8 @@ function TodoSection() {
 
     const [userId, setUserId] = useState<string | null>(null);
 
+    const [todos, setTodos] = useState<Task[]>([]);
+
     useEffect(() => {
         const fetchUserId = async () => {
             const { data, error } = await supabase.auth.getUser();
@@ -42,6 +54,27 @@ function TodoSection() {
         };
         fetchUserId();
     }, []);
+
+    // ? Fetching tasks from Supabase
+    useEffect(() => {
+        if (!userId) return; // only fetch when userId is available
+
+        const fetchTodos = async () => {
+            const { data, error } = await supabase
+                .from("tasks")
+                .select("*")
+                .eq("user_id", userId)
+                .order("created_at", { ascending: true });
+
+            if (error) {
+                console.error("Error fetching tasks:", error.message);
+            } else {
+                setTodos(data || []);
+            }
+        };
+
+        fetchTodos();
+    }, [userId]);
 
     const toggleDropdown = () => {
         setOptionsDropdown((prev) => !prev);
@@ -209,17 +242,30 @@ function TodoSection() {
 
     // ? Sample todos from todos.ts
     // Initialize state with your todos array
-    const [todos, setTodos] = useState(initialTodos);
+    // const [todos, setTodos] = useState(initialTodos);
 
     // Toggle the isCompleted state for the selected todo
-    const toggleComplete = (id: number) => {
-        setTodos((prev) =>
-            prev.map((todo) =>
-                todo.id === id
-                    ? { ...todo, isCompleted: !todo.isCompleted }
-                    : todo
-            )
-        );
+    const toggleComplete = async (id: string) => {
+        const task = todos.find((todo) => todo.id === id);
+        if (!task) return;
+
+        const { error } = await supabase
+            .from("tasks")
+            .update({ completed: !task.completed })
+            .eq("id", id);
+
+        if (error) {
+            console.error("Error updating task completion:", error.message);
+        } else {
+            // If update succeeds, update local state
+            setTodos((prev) =>
+                prev.map((todo) =>
+                    todo.id === id
+                        ? { ...todo, completed: !todo.completed }
+                        : todo
+                )
+            );
+        }
     };
 
     return (
@@ -305,10 +351,14 @@ function TodoSection() {
                         <TodoCard
                             key={todo.id}
                             title={todo.title}
-                            time={todo.time}
+                            time={todo.deadline || undefined} // (optional: fallback)
                             description={todo.description}
-                            isCompleted={todo.isCompleted}
-                            category={todo.category}
+                            isCompleted={todo.completed}
+                            category={
+                                allCategories.find(
+                                    (cat) => cat.id === todo.category_id
+                                )?.cat_name || ""
+                            }
                             onToggleComplete={() => toggleComplete(todo.id)}
                         />
                     ))
@@ -371,7 +421,7 @@ function TodoSection() {
                         />
 
                         {showCategoryPopup && (
-                            <div className="flex flex-col gap-2 absolute w-[350px] bg-white border p-2 rounded-md shadow-md z-50 bottom-0 mb-14">
+                            <div className="flex flex-col gap-2 absolute w-[350px] bg-white border border-gray-200 p-4 rounded-2xl shadow-md z-50 bottom-0 mb-14">
                                 {/* Filtered matching categories */}
                                 {allCategories.filter((cat) =>
                                     cat.cat_name

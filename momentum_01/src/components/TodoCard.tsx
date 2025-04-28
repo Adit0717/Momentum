@@ -13,6 +13,17 @@ interface TodoCardProps {
     onToggleComplete?: () => void;
 }
 
+// ✅ Helper function to format ISO timestamps nicely
+const formatDateTime = (isoString: string) => {
+    const date = new Date(isoString);
+    return date.toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+    });
+};
+
 export default function TodoCard({
     title,
     time,
@@ -21,27 +32,20 @@ export default function TodoCard({
     isCompleted,
     onToggleComplete,
 }: TodoCardProps) {
-    // ? onClick open dialog box
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
+    const cardRef = useRef<HTMLDivElement>(null);
 
     const handleCardClick = () => {
         setDialogOpen(true);
     };
 
-    // ? Context menu (view and delete)
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
-    const cardRef = useRef<HTMLDivElement>(null);
-
-    // handle right click to open menu
     const handleContextMenu = (e: React.MouseEvent) => {
         e.preventDefault();
         if (!cardRef.current) return;
 
-        // Get bounding rectangle of the card
         const rect = cardRef.current.getBoundingClientRect();
-
-        // Calculate local coordinates within the card
         const localX = e.clientX - rect.left;
         const localY = e.clientY - rect.top;
 
@@ -49,25 +53,20 @@ export default function TodoCard({
         setMenuOpen(true);
     };
 
-    // close menu if user chooses an option or clicks elsewhere
     const handleCloseMenu = () => {
         setMenuOpen(false);
     };
 
     const handleView = () => {
-        console.log("View tasks:", title);
-        // todo: Handle view/edit todo logic
+        console.log("View task:", title);
         handleCloseMenu();
     };
 
     const handleDelete = () => {
         console.log("Delete task:", title);
-        // todo: Handle delete todo logic
-
         handleCloseMenu();
     };
 
-    // ? detects outside clicks and closes the context menu
     useEffect(() => {
         function handleGlobalContextMenu(e: MouseEvent) {
             if (
@@ -77,7 +76,6 @@ export default function TodoCard({
                 setMenuOpen(false);
             }
         }
-
         function handleGlobalMouseDown(e: MouseEvent) {
             if (
                 cardRef.current &&
@@ -86,10 +84,8 @@ export default function TodoCard({
                 setMenuOpen(false);
             }
         }
-
         document.addEventListener("contextmenu", handleGlobalContextMenu);
         document.addEventListener("mousedown", handleGlobalMouseDown);
-
         return () => {
             document.removeEventListener(
                 "contextmenu",
@@ -100,31 +96,27 @@ export default function TodoCard({
     }, []);
 
     return (
-        // todo: on click (except checkbox) open detailed task card
-        // todo: give options to update, and delete
-
         <div
             ref={cardRef}
             className="relative"
-            onContextMenu={handleContextMenu} // ? listening for right click
+            onContextMenu={handleContextMenu}
         >
-            {/* Left Section: Checkbox + Title */}
             <div className="flex items-start justify-between hover:bg-gray-100 gap-2 transition duration-150">
                 <div className="flex items-center ps-4 pt-5">
                     <input
                         type="checkbox"
                         checked={isCompleted}
                         onChange={(e) => {
-                            e.stopPropagation(); // Prevent parent onClick from firing
+                            e.stopPropagation();
                             onToggleComplete && onToggleComplete();
-                            console.log("TodoCard checkbox clicked");
                         }}
                         className="w-5 h-5 accent-blue-500"
                     />
                 </div>
+
                 <div
-                    className=" flex flex-col w-full gap-1 py-4 ps-2 pe-4"
-                    onClick={handleCardClick} // ? open dialog box on click on card
+                    className="flex flex-col w-full gap-1 py-4 ps-2 pe-4"
+                    onClick={handleCardClick}
                 >
                     <div className="flex justify-between w-full items-center">
                         <span
@@ -137,15 +129,28 @@ export default function TodoCard({
                             {title}
                         </span>
 
-                        {/* Right Section: Time */}
-                        <div className="text-sm text-gray-600">{time}</div>
+                        {/* ✅ Time */}
                     </div>
+
+                    {time && (
+                        <div
+                            className={`text-sm ${
+                                new Date(time) > new Date()
+                                    ? "text-blue-600"
+                                    : "text-red-500"
+                            }`}
+                        >
+                            {formatDateTime(time)}
+                        </div>
+                    )}
                     {description && (
                         <div className="text-sm w-full text-gray-500">
                             {description}
                         </div>
                     )}
-                    <div className="flex flex-wrap mt-1 text-sm bg-red-300">
+
+                    {/* Category */}
+                    <div className="flex flex-wrap mt-1">
                         {category && (
                             <CategoryPill label={category} deletable={false} />
                         )}
@@ -153,7 +158,7 @@ export default function TodoCard({
                 </div>
             </div>
 
-            {/* // ? Dialog box */}
+            {/* Dialog box */}
             {dialogOpen && (
                 <TodoDialogBox
                     title={title}
