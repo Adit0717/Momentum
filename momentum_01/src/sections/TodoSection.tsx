@@ -244,20 +244,29 @@ function TodoSection() {
     // Initialize state with your todos array
     // const [todos, setTodos] = useState(initialTodos);
 
-    // Toggle the isCompleted state for the selected todo
+    //? Toggle the isCompleted state for the selected todo (optimized - local first and supabase later)
     const toggleComplete = async (id: string) => {
-        const task = todos.find((todo) => todo.id === id);
-        if (!task) return;
+        // updating the UI first
+        setTodos((prev) =>
+            prev.map((todo) =>
+                todo.id === id ? { ...todo, completed: !todo.completed } : todo
+            )
+        );
 
+        // Then attempt Supabase update
         const { error } = await supabase
             .from("tasks")
-            .update({ completed: !task.completed })
+            .update({
+                completed:
+                    todos.find((todo) => todo.id === id)?.completed === false,
+            })
             .eq("id", id);
 
+        // If Supabase fails, rollback
         if (error) {
             console.error("Error updating task completion:", error.message);
-        } else {
-            // If update succeeds, update local state
+
+            // Rollback the change
             setTodos((prev) =>
                 prev.map((todo) =>
                     todo.id === id
