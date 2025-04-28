@@ -57,7 +57,9 @@ function DashBoard() {
                 <TodoSection />
             </div>
 
-            <div className="border border-gray-300 h-full flex-1">col 2</div>
+            <div className="border border-gray-300 h-full flex-1 hidden">
+                col 2
+            </div>
         </div>
     );
 }

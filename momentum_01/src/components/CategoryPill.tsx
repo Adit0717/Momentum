@@ -15,7 +15,7 @@ interface CategoryPillProps {
 
 export default function CategoryPill({
     label,
-    color = "bg-gray-200",
+    color = "#e5e7eb",
     textColor = "text-black",
     onClick,
     deletable = true,
@@ -23,7 +23,10 @@ export default function CategoryPill({
     return (
         <button
             onClick={onClick}
-            className={`group inline-flex items-center px-2 py-1 rounded-full text-xs font-medium  hover:opacity-60 transition-all ${color} ${textColor}`}
+            className={`group inline-flex items-center px-2 py-1 rounded-full text-xs font-medium  hover:opacity-60 transition-all ${textColor}`}
+            style={{
+                backgroundColor: color || "#e5e7eb",
+            }}
         >
             <span className="">{label}</span>
             {deletable && (

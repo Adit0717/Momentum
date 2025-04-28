@@ -13,7 +13,7 @@ interface Category {
     id: string;
     cat_name: string;
     cat_color?: string;
-    created_at?: string; // if your table has created_at
+    created_at?: string;
 }
 
 export default function CategoriesDialogBox({

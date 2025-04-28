@@ -14,11 +14,34 @@ import "material-icons/iconfont/material-icons.css";
 import { useEffect, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import CategoriesDialogBox from "@/sections/CategoriesDialogBox";
+import { supabase } from "@/lib/supabaseClient";
+
+interface Category {
+    id: string;
+    cat_name: string;
+    cat_color?: string;
+    created_at?: string;
+}
 
 function TodoSection() {
     const [isCategoriesDialogOpen, setIsCategoriesDialogOpen] = useState(false);
     const [optionsDropdown, setOptionsDropdown] = useState(false);
     const headerRef = useRef<HTMLDivElement>(null);
+
+    const [showCategoryPopup, setShowCategoryPopup] = useState(false);
+    const [allCategories, setAllCategories] = useState<Category[]>([]);
+
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchUserId = async () => {
+            const { data, error } = await supabase.auth.getUser();
+            if (data?.user?.id) {
+                setUserId(data.user.id);
+            }
+        };
+        fetchUserId();
+    }, []);
 
     const toggleDropdown = () => {
         setOptionsDropdown((prev) => !prev);
@@ -42,24 +65,106 @@ function TodoSection() {
         setDateTime(e.target.value);
     };
 
-    // ? Categories (static)
+    // ? Categories (FRONTEND)
     const [selectedCategory, setSelectedCategory] = useState("");
+    // todo: category color
     const [categoryInput, setCategoryInput] = useState("");
 
-    // ? Add category on ENTER key
-    // Separate function for handling category input on Enter key
-    const handleCategoryKeyDown = (
+    const handleCategoryKeyDown = async (
         e: React.KeyboardEvent<HTMLInputElement>
     ) => {
+        // ? Add category on ENTER key --> inserts to backend too
         if (e.key === "Enter") {
-            e.preventDefault(); // Prevent form submission or line break
-            const newCategory = categoryInput.trim();
-            if (newCategory && newCategory !== selectedCategory) {
-                setSelectedCategory(newCategory);
+            e.preventDefault(); // prevent default form behavior
+
+            const newCategoryName = categoryInput.trim();
+            if (!newCategoryName) return;
+
+            const existingCategory = allCategories.find(
+                (cat) =>
+                    cat.cat_name.toLowerCase() === newCategoryName.toLowerCase()
+            );
+
+            if (existingCategory) {
+                setSelectedCategory(existingCategory.cat_name);
+            } else {
+                try {
+                    // ✅ Get current user
+                    const { data: userData, error: userError } =
+                        await supabase.auth.getUser();
+
+                    if (userError || !userData?.user) {
+                        console.error(
+                            "User not authenticated:",
+                            userError?.message
+                        );
+                        return;
+                    }
+
+                    const userId = userData.user.id;
+
+                    //
+                    const { data: insertedCategory, error: insertError } =
+                        await supabase
+                            .from("task_categories")
+                            .insert([
+                                {
+                                    cat_name: newCategoryName,
+                                    cat_color: "#d1d5db", // optional: default gray
+                                    user_id: userId, // ✅ Important!
+                                },
+                            ])
+                            .select()
+                            .single();
+
+                    if (insertError) {
+                        console.error(
+                            "Failed to insert category:",
+                            insertError.message
+                        );
+                        // fallback local
+                        const fallbackCat = {
+                            id: Date.now().toString(),
+                            cat_name: newCategoryName,
+                            cat_color: "#d1d5db",
+                        };
+                        setAllCategories((prev) => [...prev, fallbackCat]);
+                        setSelectedCategory(newCategoryName);
+                    } else if (insertedCategory) {
+                        setAllCategories((prev) => [...prev, insertedCategory]);
+                        setSelectedCategory(insertedCategory.cat_name);
+                    }
+                } catch (err) {
+                    console.error("Unexpected error:", err);
+                }
             }
+
             setCategoryInput("");
+            setShowCategoryPopup(false);
+        }
+
+        if (e.key === "Escape") {
+            setShowCategoryPopup(false);
         }
     };
+
+    // ? Fetching actual categories from backend
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const { data, error } = await supabase
+                .from("task_categories")
+                .select("*")
+                .order("created_at", { ascending: true });
+
+            if (error) {
+                console.error("Error fetching categories:", error.message);
+            } else {
+                setAllCategories(data || []);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     // // ? Remove category (optional)
     // const removeCategory = (cat: string) => {
@@ -258,12 +363,76 @@ function TodoSection() {
                         </span>
                         <input
                             className="px-2 py-2 w-full focus:outline-none text-sm"
-                            placeholder={`Add categories`}
+                            placeholder={`Add a category`}
                             value={categoryInput}
                             onChange={(e) => setCategoryInput(e.target.value)}
                             onKeyDown={handleCategoryKeyDown}
-                            // onSubmit={() => alert("Enter pressed.")}
+                            onFocus={() => setShowCategoryPopup(true)}
                         />
+
+                        {showCategoryPopup && (
+                            <div className="flex flex-col gap-2 absolute w-[350px] bg-white border p-2 rounded-md shadow-md z-50 bottom-0 mb-14">
+                                {/* Filtered matching categories */}
+                                {allCategories.filter((cat) =>
+                                    cat.cat_name
+                                        .toLowerCase()
+                                        .includes(categoryInput.toLowerCase())
+                                ).length > 0 ? (
+                                    <div className="flex flex-wrap gap-2">
+                                        {allCategories
+                                            .filter((cat) =>
+                                                cat.cat_name
+                                                    .toLowerCase()
+                                                    .includes(
+                                                        categoryInput.toLowerCase()
+                                                    )
+                                            )
+                                            .map((cat) => (
+                                                <CategoryPill
+                                                    key={cat.id}
+                                                    label={cat.cat_name}
+                                                    color={cat.cat_color}
+                                                    onClick={() => {
+                                                        setSelectedCategory(
+                                                            cat.cat_name
+                                                        );
+                                                        setCategoryInput("");
+                                                        setShowCategoryPopup(
+                                                            false
+                                                        );
+                                                    }}
+                                                    deletable={false}
+                                                />
+                                            ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-gray-400 text-sm text-center">
+                                        No matching categories.
+                                    </div>
+                                )}
+
+                                {/* Create new category */}
+                                {categoryInput.trim() &&
+                                    !allCategories.some(
+                                        (cat) =>
+                                            cat.cat_name.toLowerCase() ===
+                                            categoryInput.trim().toLowerCase()
+                                    ) && (
+                                        <button
+                                            onClick={async () => {
+                                                await handleCategoryKeyDown({
+                                                    key: "Enter",
+                                                    preventDefault: () => {},
+                                                } as any);
+                                            }}
+                                            className="flex items-center justify-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline mt-2"
+                                        >
+                                            Create new category: &quot;
+                                            {categoryInput.trim()}&quot;
+                                        </button>
+                                    )}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
