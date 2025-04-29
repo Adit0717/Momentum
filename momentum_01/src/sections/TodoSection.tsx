@@ -51,6 +51,7 @@ function TodoSection() {
 
     const [parent] = useAutoAnimate();
 
+    // ? Fetching user
     useEffect(() => {
         const fetchUserId = async () => {
             const { data, error } = await supabase.auth.getUser();
@@ -106,7 +107,7 @@ function TodoSection() {
 
     // ? Categories (FRONTEND)
     const [selectedCategory, setSelectedCategory] = useState("");
-    // todo: category color
+
     const [categoryInput, setCategoryInput] = useState("");
 
     const handleCategoryKeyDown = async (
@@ -273,6 +274,76 @@ function TodoSection() {
         }
     };
 
+    const handleDeleteTask = async (id: string) => {
+        if (!id) return;
+
+        const { error } = await supabase.from("tasks").delete().eq("id", id);
+
+        if (error) {
+            console.error("Error deleting task:", error.message);
+        } else {
+            setTodos((prev) => prev.filter((todo) => todo.id !== id));
+        }
+    };
+
+    // ? Dropdown option - delete all completed tasks
+    const handleDeleteAllCompleted = async () => {
+        if (!userId) return;
+        // Close the dropdown immediately
+        setOptionsDropdown(false);
+
+        // Bulk delete on the backend
+        const { error } = await supabase
+            .from("tasks")
+            .delete()
+            .eq("user_id", userId)
+            .eq("completed", true);
+
+        if (error) {
+            console.error("Error deleting completed tasks:", error.message);
+        }
+
+        // Remove them from local state as well
+        setTodos((prev) => prev.filter((t) => !t.completed));
+    };
+
+    // ? update both local + backend
+    const handleTaskUpdate = async (
+        id: string,
+        newTitle: string,
+        newDescription: string,
+        newDeadline: string | null,
+        newCategory: { id: string; name: string } | null
+    ) => {
+        // update local immediately
+        setTodos((prev) =>
+            prev.map((t) =>
+                t.id === id
+                    ? {
+                          ...t,
+                          title: newTitle,
+                          description: newDescription,
+                          deadline: newDeadline,
+                          category_id: newCategory?.id ?? null,
+                      }
+                    : t
+            )
+        );
+
+        // persist to Supabase
+        const { error } = await supabase
+            .from("tasks")
+            .update({
+                title: newTitle,
+                description: newDescription,
+                deadline: newDeadline,
+                category_id: newCategory?.id ?? null,
+            })
+            .eq("id", id);
+
+        if (error) console.error("Error updating task:", error.message);
+    };
+
     // ? controlling visiblity of description and date-time picker
     const [isFocused, setIsFocused] = useState(false);
 
@@ -435,44 +506,57 @@ function TodoSection() {
                         </a>
 
                         <a
-                            onClick={() =>
-                                alert("Show completed tasks clicked")
-                            }
+                            onClick={handleDeleteAllCompleted}
                             className="p-2 mt-1 px-4 cursor-pointer hover:ps-6 hover:text-red-900 hover:bg-red-300 duration-200"
                         >
-                            Delete all tasks
+                            Delete all completed tasks
                         </a>
                     </div>
                 )}
             </div>
 
             {/* // ? Sample tasks placeholder */}
-
-            <div ref={parent} className="flex-1 pb-10 ">
+            <div ref={parent} className="flex-1 pb-10">
                 {todos.length > 0 ? (
                     todos
                         .filter(
-                            (todo) =>
-                                preferences.show_completed_tasks ||
-                                !todo.completed
+                            (t) =>
+                                preferences.show_completed_tasks || !t.completed
                         )
-                        .map((todo) => (
-                            <TodoCard
-                                key={todo.id}
-                                title={todo.title}
-                                time={todo.deadline || undefined}
-                                description={todo.description}
-                                isCompleted={todo.completed}
-                                category={
-                                    allCategories.find(
-                                        (cat) => cat.id === todo.category_id
-                                    )?.cat_name || ""
-                                }
-                                onToggleComplete={() => toggleComplete(todo.id)}
-                                showDescription={preferences.show_descriptions}
-                                showCategories={preferences.show_categories}
-                            />
-                        ))
+                        .map((t) => {
+                            // find matching category object or null
+                            const catObj =
+                                allCategories.find(
+                                    (c) => c.id === t.category_id
+                                ) || null;
+                            return (
+                                <TodoCard
+                                    key={t.id}
+                                    taskId={t.id}
+                                    title={t.title}
+                                    description={t.description}
+                                    time={t.deadline || undefined}
+                                    category={
+                                        catObj
+                                            ? {
+                                                  id: catObj.id,
+                                                  name: catObj.cat_name,
+                                              }
+                                            : null
+                                    }
+                                    isCompleted={t.completed}
+                                    onToggleComplete={() =>
+                                        toggleComplete(t.id)
+                                    }
+                                    onDelete={() => handleDeleteTask(t.id)}
+                                    onTaskUpdate={handleTaskUpdate}
+                                    showDescription={
+                                        preferences.show_descriptions
+                                    }
+                                    showCategories={preferences.show_categories}
+                                />
+                            );
+                        })
                 ) : (
                     <div className="p-4 text-gray-500">No tasks yet</div>
                 )}
@@ -552,7 +636,7 @@ function TodoSection() {
                                                 <CategoryPill
                                                     key={cat.id}
                                                     label={cat.cat_name}
-                                                    color={cat.cat_color}
+                                                    // color={cat.cat_color}
                                                     onClick={() => {
                                                         setSelectedCategory(
                                                             cat.cat_name
