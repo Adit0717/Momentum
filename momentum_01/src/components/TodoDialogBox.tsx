@@ -198,7 +198,7 @@ export default function TodoDialogBox({
                                 value={localTime.slice(0, 16)}
                                 onChange={(e) => setLocalTime(e.target.value)}
                                 onBlur={() => setEditingTime(false)}
-                                className="px-2 py-1 border rounded focus:outline-none"
+                                className="px-2 py-1 focus:outline-none bg-gray-200 rounded-full pe-1"
                             />
                         ) : (
                             <div
@@ -208,10 +208,10 @@ export default function TodoDialogBox({
                                     new Date(localTime) > new Date()
                                         ? "text-blue-600"
                                         : "text-red-500"
-                                }`}
+                                } hover:bg-gray-300 px-3 py-1 rounded-full`}
                             >
                                 {localTime
-                                    ? `Due: ${formatDateTime(localTime)}`
+                                    ? `${formatDateTime(localTime)}`
                                     : "No deadline set"}
                             </div>
                         )}
@@ -219,52 +219,73 @@ export default function TodoDialogBox({
                         {/* Category dropdown */}
                         <div className="relative">
                             {dropdownOpen ? (
-                                <div className="absolute bg-white border rounded shadow p-1 w-48 max-h-40 overflow-auto z-10">
+                                <div className="absolute bg-white border border-gray-300 rounded-xl shadow p-3 w-80 max-h-40 overflow-auto z-10">
                                     <input
-                                        placeholder="Search or create…"
+                                        placeholder="Search a category"
                                         value={categoryInput}
                                         onChange={(e) =>
                                             setCategoryInput(e.target.value)
                                         }
-                                        className="w-full px-2 py-1 border-b focus:outline-none mb-1"
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Escape") {
+                                                setDropdownOpen(false);
+                                                setCategoryInput("");
+                                            }
+                                        }}
+                                        className="w-full px-2 py-1 border-b focus:outline-none mb-1 sticky"
                                     />
-                                    {allCategories
-                                        .filter((c) =>
-                                            c.cat_name
-                                                .toLowerCase()
-                                                .includes(
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {allCategories
+                                            .filter((c) =>
+                                                c.cat_name
+                                                    .toLowerCase()
+                                                    .includes(
+                                                        categoryInput.toLowerCase()
+                                                    )
+                                            )
+                                            .map((c) => (
+                                                <CategoryPill
+                                                    key={c.id}
+                                                    label={c.cat_name}
+                                                    onClick={() => {
+                                                        setLocalCategory({
+                                                            id: c.id,
+                                                            name: c.cat_name,
+                                                        });
+                                                        setDropdownOpen(false);
+                                                        setCategoryInput("");
+                                                    }}
+                                                />
+                                                // <div
+                                                //     key={c.id}
+                                                //     className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+                                                //     onClick={() => {
+                                                //         setLocalCategory({
+                                                //             id: c.id,
+                                                //             name: c.cat_name,
+                                                //         });
+                                                //         setDropdownOpen(false);
+                                                //         setCategoryInput("");
+                                                //     }}
+                                                // >
+                                                //     {c.cat_name}
+                                                // </div>
+                                            ))}
+                                        {categoryInput.trim() &&
+                                            !allCategories.some(
+                                                (c) =>
+                                                    c.cat_name.toLowerCase() ===
                                                     categoryInput.toLowerCase()
-                                                )
-                                        )
-                                        .map((c) => (
-                                            <div
-                                                key={c.id}
-                                                className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                                                onClick={() => {
-                                                    setLocalCategory({
-                                                        id: c.id,
-                                                        name: c.cat_name,
-                                                    });
-                                                    setDropdownOpen(false);
-                                                    setCategoryInput("");
-                                                }}
-                                            >
-                                                {c.cat_name}
-                                            </div>
-                                        ))}
-                                    {categoryInput.trim() &&
-                                        !allCategories.some(
-                                            (c) =>
-                                                c.cat_name.toLowerCase() ===
-                                                categoryInput.toLowerCase()
-                                        ) && (
-                                            <div
-                                                className="px-2 py-1 text-blue-600 hover:bg-gray-100 cursor-pointer"
-                                                onClick={createCategory}
-                                            >
-                                                Create “{categoryInput.trim()}”
-                                            </div>
-                                        )}
+                                            ) && (
+                                                <div
+                                                    className="px-2 py-1 text-blue-600 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={createCategory}
+                                                >
+                                                    Create “
+                                                    {categoryInput.trim()}”
+                                                </div>
+                                            )}
+                                    </div>
                                 </div>
                             ) : localCategory ? (
                                 <CategoryPill
@@ -274,7 +295,7 @@ export default function TodoDialogBox({
                                         // remove existing
                                         setLocalCategory(null);
                                         // reopen selector
-                                        setDropdownOpen(true);
+                                        // setDropdownOpen(false);
                                     }}
                                 />
                             ) : (
