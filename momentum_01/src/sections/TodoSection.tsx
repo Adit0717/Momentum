@@ -16,6 +16,7 @@ import TextareaAutosize from "react-textarea-autosize";
 import CategoriesDialogBox from "@/sections/CategoriesDialogBox";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { supabase } from "@/lib/supabaseClient";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 
 interface Task {
     id: string;
@@ -35,10 +36,10 @@ interface Category {
 }
 
 function TodoSection() {
-    const [showDescriptions, setShowDescriptions] = useState(true);
+    const { preferences, updatePreference, loading } = useUserPreferences();
+    const [optionsDropdown, setOptionsDropdown] = useState(false);
 
     const [isCategoriesDialogOpen, setIsCategoriesDialogOpen] = useState(false);
-    const [optionsDropdown, setOptionsDropdown] = useState(false);
     const headerRef = useRef<HTMLDivElement>(null);
 
     const [showCategoryPopup, setShowCategoryPopup] = useState(false);
@@ -83,10 +84,6 @@ function TodoSection() {
 
     const toggleDropdown = () => {
         setOptionsDropdown((prev) => !prev);
-    };
-
-    const toggleShowDescriptions = () => {
-        setShowDescriptions((prev) => !prev);
     };
 
     // ? for bottom add new task
@@ -336,6 +333,10 @@ function TodoSection() {
         }
     };
 
+    if (loading) {
+        return <div className="p-6">Loading user preferences...</div>;
+    }
+
     return (
         <div className="h-full w-full flex flex-col overflow-auto no-scrollbar">
             {/* Top Header bar Fixed */}
@@ -343,7 +344,7 @@ function TodoSection() {
                 <div className="w-full flex items-center justify-between ps-4 pe-2 py-4">
                     <div className="text-4xl ">All Tasks</div>
                     <button
-                        onClick={toggleDropdown}
+                        onClick={() => setOptionsDropdown((prev) => !prev)}
                         className="h-12 w-12 rounded-full flex justify-center items-center hover:bg-gray-100"
                     >
                         {optionsDropdown ? (
@@ -360,41 +361,69 @@ function TodoSection() {
                 {optionsDropdown && (
                     <div className="w-full flex flex-col transition-all duration-300 border-b-2">
                         <a
-                            onClick={toggleShowDescriptions}
+                            onClick={() =>
+                                updatePreference(
+                                    "show_completed_tasks",
+                                    !preferences.show_completed_tasks
+                                )
+                            }
                             className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center"
                         >
-                            Show descriptions
-                            {showDescriptions ? (
-                                <span className="text-sm font-bold text-green-600">
-                                    ON
-                                </span>
-                            ) : (
-                                <span className="text-sm font-bold text-red-600">
-                                    OFF
-                                </span>
-                            )}
+                            Show completed tasks
+                            <span
+                                className={`text-sm font-bold ${
+                                    preferences.show_completed_tasks
+                                        ? "text-green-600"
+                                        : "text-red-400"
+                                }`}
+                            >
+                                {preferences.show_completed_tasks
+                                    ? "ON"
+                                    : "OFF"}
+                            </span>
                         </a>
                         <a
                             onClick={() =>
-                                alert("Show completed tasks clicked")
+                                updatePreference(
+                                    "show_descriptions",
+                                    !preferences.show_descriptions
+                                )
                             }
-                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center "
+                            className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center"
                         >
-                            Show completed tasks
-                            <span className="text-sm font-bold text-gray-400">
-                                OFF
+                            Show descriptions
+                            <span
+                                className={`text-sm font-bold ${
+                                    preferences.show_descriptions
+                                        ? "text-green-600"
+                                        : "text-red-400"
+                                }`}
+                            >
+                                {preferences.show_descriptions ? "ON" : "OFF"}
                             </span>
                         </a>
 
                         <a
-                            onClick={() => alert("option1 clicked")}
+                            onClick={() =>
+                                updatePreference(
+                                    "show_categories",
+                                    !preferences.show_categories
+                                )
+                            }
                             className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center"
                         >
                             Show categories
-                            <span className="text-sm font-bold text-green-600">
-                                ON
+                            <span
+                                className={`text-sm font-bold ${
+                                    preferences.show_categories
+                                        ? "text-green-600"
+                                        : "text-red-400"
+                                }`}
+                            >
+                                {preferences.show_categories ? "ON" : "OFF"}
                             </span>
                         </a>
+
                         <a
                             onClick={openCategoriesDialog}
                             className="p-2 px-4 hover:bg-gray-100 cursor-pointer hover:ps-6 duration-200 flex justify-between items-center "
@@ -421,22 +450,29 @@ function TodoSection() {
 
             <div ref={parent} className="flex-1 pb-10 ">
                 {todos.length > 0 ? (
-                    todos.map((todo) => (
-                        <TodoCard
-                            key={todo.id}
-                            title={todo.title}
-                            time={todo.deadline || undefined} // (optional: fallback)
-                            description={todo.description}
-                            isCompleted={todo.completed}
-                            category={
-                                allCategories.find(
-                                    (cat) => cat.id === todo.category_id
-                                )?.cat_name || ""
-                            }
-                            onToggleComplete={() => toggleComplete(todo.id)}
-                            showDescription={showDescriptions}
-                        />
-                    ))
+                    todos
+                        .filter(
+                            (todo) =>
+                                preferences.show_completed_tasks ||
+                                !todo.completed
+                        )
+                        .map((todo) => (
+                            <TodoCard
+                                key={todo.id}
+                                title={todo.title}
+                                time={todo.deadline || undefined}
+                                description={todo.description}
+                                isCompleted={todo.completed}
+                                category={
+                                    allCategories.find(
+                                        (cat) => cat.id === todo.category_id
+                                    )?.cat_name || ""
+                                }
+                                onToggleComplete={() => toggleComplete(todo.id)}
+                                showDescription={preferences.show_descriptions}
+                                showCategories={preferences.show_categories}
+                            />
+                        ))
                 ) : (
                     <div className="p-4 text-gray-500">No tasks yet</div>
                 )}

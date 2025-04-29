@@ -12,6 +12,7 @@ interface TodoCardProps {
     isCompleted?: boolean;
     onToggleComplete?: () => void;
     showDescription?: boolean;
+    showCategories?: boolean;
 }
 
 const formatDateTime = (isoString: string) => {
@@ -32,6 +33,7 @@ export default function TodoCard({
     isCompleted,
     onToggleComplete,
     showDescription,
+    showCategories,
 }: TodoCardProps) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -129,8 +131,6 @@ export default function TodoCard({
                         >
                             {title}
                         </span>
-
-                        {/* ✅ Time */}
                     </div>
 
                     {time && (
@@ -144,18 +144,31 @@ export default function TodoCard({
                             {formatDateTime(time)}
                         </div>
                     )}
-                    {showDescription && description && (
-                        <div className="text-sm w-full text-gray-500">
+                    {description && (
+                        <div
+                            className={`text-sm w-full text-gray-500 transition-all duration-300 ease-in-out overflow-hidden
+            ${showDescription ? "opacity-100 max-h-40" : "opacity-0 max-h-0"}
+        `}
+                            style={{
+                                transitionProperty: "opacity, max-height",
+                            }}
+                        >
                             {description}
                         </div>
                     )}
 
                     {/* Category */}
-                    <div className="flex flex-wrap mt-1">
-                        {category && (
+                    {category && (
+                        <div
+                            className={`flex transition-all duration-300 ease-in-out overflow-hidden ${
+                                showCategories
+                                    ? "opacity-100 max-h-40"
+                                    : "opacity-0 max-h-0"
+                            }`}
+                        >
                             <CategoryPill label={category} deletable={false} />
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
