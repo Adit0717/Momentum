@@ -11,10 +11,12 @@ import TodoSection from "@/sections/TodoSection";
 import UserProfilePanel from "@/sections/UserProfilePanel";
 import useUserProfile from "@/hooks/useUserProfiles";
 import UserStats from "@/sections/UserStats";
+import FocusView from "@/sections/FocusView";
 
 function DashBoard() {
     const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
     const { profile, loading, error } = useUserProfile();
+    const [isFocusMode, setIsFocusMode] = useState(false);
 
     const handleAvatarClick = () => {
         setIsUserProfileOpen(true);
@@ -23,7 +25,7 @@ function DashBoard() {
         <div className=" h-screen w-screen flex gap-4 p-5">
             {/* // ? Right top button */}
             <div
-                className="absolute top-0 right-0 m-5 flex flex-col gap-2 bg-white pb-3 ps-3 border-gray-300 border-b-1 border-s-1"
+                className="absolute top-0 right-0 z-50 m-5 flex flex-col gap-2 bg-white pb-3 ps-3 border-gray-300 border-b-1 border-s-1"
                 style={{
                     borderEndStartRadius: "36px",
                 }}
@@ -44,6 +46,9 @@ function DashBoard() {
                 />
 
                 <button
+                    onClick={() => {
+                        setIsFocusMode((prev) => !prev);
+                    }}
                     style={{ width: "50px", height: "50px" }}
                     className="rounded-full flex border-2 border-black justify-center items-center hover:bg-black duration-200"
                 >
@@ -51,14 +56,20 @@ function DashBoard() {
                 </button>
             </div>
 
-            <div
-                className="border border-gray-300 h-full overflow-hidden "
-                style={{ minWidth: "400px", maxWidth: "400px" }}
-            >
-                <TodoSection />
-            </div>
+            {!isFocusMode && (
+                <div
+                    className="border border-gray-300 h-full overflow-hidden"
+                    style={{ minWidth: "400px", maxWidth: "400px" }}
+                >
+                    <TodoSection />
+                </div>
+            )}
 
             <div className="border border-gray-300 h-full flex-1"> <UserStats /> </div>
+            {/* Right Section (Focus Mode OR Default Panel) */}
+            <div className="border border-gray-300 h-full flex-1 overflow-hidden">
+                {isFocusMode ? <FocusView /> : <div className="p-6">col 2</div>}
+            </div>
         </div>
     );
 }
