@@ -412,8 +412,8 @@ function TodoSection() {
         <div className="h-full w-full flex flex-col overflow-auto no-scrollbar">
             {/* Top Header bar Fixed */}
             <div ref={headerRef} className="backdrop-blur-md sticky top-0 z-10">
-                <div className="w-full flex items-center justify-between ps-4 pe-2 py-4">
-                    <div className="text-4xl ">All Tasks</div>
+                <div className="w-full flex items-center justify-between ps-4 pe-2 py-4 ">
+                    <div className="text-4xl">All Tasks</div>
                     <button
                         onClick={() => setOptionsDropdown((prev) => !prev)}
                         className="h-12 w-12 rounded-full flex justify-center items-center hover:bg-gray-100"

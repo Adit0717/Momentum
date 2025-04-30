@@ -256,20 +256,6 @@ export default function TodoDialogBox({
                                                         setCategoryInput("");
                                                     }}
                                                 />
-                                                // <div
-                                                //     key={c.id}
-                                                //     className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                                                //     onClick={() => {
-                                                //         setLocalCategory({
-                                                //             id: c.id,
-                                                //             name: c.cat_name,
-                                                //         });
-                                                //         setDropdownOpen(false);
-                                                //         setCategoryInput("");
-                                                //     }}
-                                                // >
-                                                //     {c.cat_name}
-                                                // </div>
                                             ))}
                                         {categoryInput.trim() &&
                                             !allCategories.some(
