@@ -68,6 +68,8 @@ export default function TodayFocusCard() {
         else comparison = `Same as yesterday.`;
     } else if (todaySec > 0) {
         comparison = "First session more than yesterday!";
+    } else if (todaySec == 0) {
+        comparison = "You haven't focused today.";
     }
 
     return (

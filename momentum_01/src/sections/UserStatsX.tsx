@@ -14,6 +14,7 @@ import TodayFocusCard from "@/components/dashboard/TodayFocusCard";
 import WeeklyFocusBarChartCard from "@/components/dashboard/WeeklyFocusBarChartCard";
 import TopFocusCategories from "@/components/dashboard/TopFocusCategoriesCard";
 import TopFocusCategoriesCard from "@/components/dashboard/TopFocusCategoriesCard";
+import TaskCompletionProgressCard from "@/components/dashboard/TaskCompletionProgressCard";
 
 interface Category {
     id: string;
@@ -48,7 +49,15 @@ function UserStatsX() {
             {/* !!! Stats area MAIN BODY*/}
             <div className="h-full flex flex-col">
                 {/* Row 1 */}
-                <div className="h-1/2">Row 1</div>
+                <div className="flex h-1/2">
+                    <div className="flex-1/4 h-full">
+                        <TaskCompletionProgressCard />
+                    </div>
+                    <div className="flex-1/4 h-full">
+                        <TopFocusCategoriesCard />
+                    </div>
+                    <div className="flex-1/2 h-full bg-amber-50">heatmap</div>
+                </div>
 
                 {/* ROW 2 */}
                 <div className="flex h-1/2 ">

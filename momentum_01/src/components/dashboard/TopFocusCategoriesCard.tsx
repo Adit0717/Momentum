@@ -118,7 +118,7 @@ export default function TopFocusCategoriesCard() {
                             className="flex justify-between items-center"
                         >
                             <div
-                                className=" bg-blue-300 px-3 py-2 rounded-full"
+                                className=" bg-blue-400 px-3 py-2 rounded-full"
                                 style={{ opacity }}
                             >
                                 {cat}
