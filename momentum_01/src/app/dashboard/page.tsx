@@ -1,8 +1,7 @@
 "use client";
-import TempUserAvatar from "../../public/temp-user-avatar.png";
-import FocusIconLight from "../../public/focus-icon-light.svg";
-import FocusIconDark from "../../public/focus-icon-dark.svg";
-import FocusView from "@/sections/FocusView";
+import TempUserAvatar from "../../../public/temp-user-avatar.png";
+import FocusIconLight from "../../../public/focus-icon-light.svg";
+import FocusIconDark from "../../../public/focus-icon-dark.svg";
 
 import IconButton from "@/components/IconButton";
 import { useState } from "react";
@@ -10,9 +9,13 @@ import Image from "next/image";
 import TodoSection from "@/sections/TodoSection";
 
 import UserProfilePanel from "@/sections/UserProfilePanel";
+import useUserProfile from "@/hooks/useUserProfiles";
+import UserStats from "@/sections/UserStats";
+import FocusView from "@/sections/FocusView";
 
 function DashBoard() {
     const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
+    const { profile, loading, error } = useUserProfile();
     const [isFocusMode, setIsFocusMode] = useState(false);
 
     const handleAvatarClick = () => {
@@ -29,11 +32,11 @@ function DashBoard() {
             >
                 {/* // ? User avatar button */}
                 <Image
-                    src={TempUserAvatar}
+                    src={profile?.avatar_url ?? TempUserAvatar}
                     alt="user avatar"
                     width={50}
                     height={50}
-                    className="rounded-full border-2 border-black p-0.5"
+                    className="rounded-full "
                     onClick={handleAvatarClick}
                 />
                 {/* // ? Render the side user profile panel */}
@@ -62,6 +65,7 @@ function DashBoard() {
                 </div>
             )}
 
+            <div className="border border-gray-300 h-full flex-1"> <UserStats /> </div>
             {/* Right Section (Focus Mode OR Default Panel) */}
             <div className="border border-gray-300 h-full flex-1 overflow-hidden">
                 {isFocusMode ? <FocusView /> : <div className="p-6">col 2</div>}

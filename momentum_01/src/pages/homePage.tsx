@@ -3,9 +3,15 @@ import Image from "next/image";
 import LogoExtendedLight from "../../public/logo-extendend-light.svg";
 import TextField from "../components/TextField";
 import NextRoundButton from "../components/NextRoundButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { supabase } from "@/lib/supabaseClient";
 
 function HomePage() {
+    useEffect(() => {
+        console.log("Supabase client:", supabase);
+    }, []);
+
     const [signInEmail, setSignInEmail] = useState("");
     const [signInPassword, setSignInPassword] = useState("");
     const [signUpEmail, setSignUpEmail] = useState("");
