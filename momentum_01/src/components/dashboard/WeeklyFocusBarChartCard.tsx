@@ -110,7 +110,7 @@ export default function WeeklyFocusBarChartCard() {
                 <h3 className="text-sm font-medium text-gray-700 px-2">
                     WEEKLY FOCUS
                 </h3>
-                <div className="flex items-center gap-4 text-gray-600">
+                <div className="flex items-center gap-2 text-gray-600">
                     <div className="flex items-center gap-2 bg-blue-100 rounded-full">
                         <button
                             onClick={prevWeek}

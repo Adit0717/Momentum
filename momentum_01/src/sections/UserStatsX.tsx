@@ -15,6 +15,8 @@ import WeeklyFocusBarChartCard from "@/components/dashboard/WeeklyFocusBarChartC
 import TopFocusCategories from "@/components/dashboard/TopFocusCategoriesCard";
 import TopFocusCategoriesCard from "@/components/dashboard/TopFocusCategoriesCard";
 import TaskCompletionProgressCard from "@/components/dashboard/TaskCompletionProgressCard";
+import TaskCompletionTrendCard from "@/components/dashboard/TaskCompletionTrendCard";
+import CompletionDaysHeatMapCard from "@/components/dashboard/CompletionDaysHeatMapCard";
 
 interface Category {
     id: string;
@@ -42,7 +44,7 @@ function UserStatsX() {
             <div className="backdrop-blur-md sticky top-0 z-10 mb-15">
                 <div className=" flex items-center justify-between ps-4 pe-20 py-4 ">
                     <div className="text-4xl ">My Stats</div>
-                    <div className="">{dateStr}</div>
+                    <div className="text-lg">{dateStr}</div>
                 </div>
             </div>
 
@@ -54,9 +56,11 @@ function UserStatsX() {
                         <TaskCompletionProgressCard />
                     </div>
                     <div className="flex-1/4 h-full">
-                        <TopFocusCategoriesCard />
+                        <CompletionDaysHeatMapCard />
                     </div>
-                    <div className="flex-1/2 h-full bg-amber-50">heatmap</div>
+                    <div className="flex-1/2 h-full ">
+                        <TaskCompletionTrendCard />
+                    </div>
                 </div>
 
                 {/* ROW 2 */}
@@ -64,7 +68,7 @@ function UserStatsX() {
                     <div className="flex-1/4 h-full">
                         <TodayFocusCard />
                     </div>
-                    <div className="flex-1/2 h-full bg-amber-50">
+                    <div className="flex-1/2 h-full ">
                         <WeeklyFocusBarChartCard />
                     </div>
                     <div className="flex-1/4 h-full">
