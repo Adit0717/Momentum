@@ -12,6 +12,8 @@ import { supabase } from "@/lib/supabaseClient";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import TodayFocusCard from "@/components/dashboard/TodayFocusCard";
 import WeeklyFocusBarChartCard from "@/components/dashboard/WeeklyFocusBarChartCard";
+import TopFocusCategories from "@/components/dashboard/TopFocusCategoriesCard";
+import TopFocusCategoriesCard from "@/components/dashboard/TopFocusCategoriesCard";
 
 interface Category {
     id: string;
@@ -37,7 +39,7 @@ function UserStatsX() {
         <div className="h-full w-full flex flex-col overflow-auto no-scrollbar ">
             {/* Top Header bar Fixed */}
             <div className="backdrop-blur-md sticky top-0 z-10 mb-15">
-                <div className=" flex items-center justify-between ps-4 pe-20 py-4 bg-red-100">
+                <div className=" flex items-center justify-between ps-4 pe-20 py-4 ">
                     <div className="text-4xl ">My Stats</div>
                     <div className="">{dateStr}</div>
                 </div>
@@ -46,18 +48,18 @@ function UserStatsX() {
             {/* !!! Stats area MAIN BODY*/}
             <div className="h-full flex flex-col">
                 {/* Row 1 */}
-                <div className="h-1/2 bg-amber-100">Row 1</div>
+                <div className="h-1/2">Row 1</div>
 
                 {/* ROW 2 */}
                 <div className="flex h-1/2 ">
                     <div className="flex-1/4 h-full">
                         <TodayFocusCard />
                     </div>
-                    <div className="flex-1/2 h-full">
+                    <div className="flex-1/2 h-full bg-amber-50">
                         <WeeklyFocusBarChartCard />
                     </div>
                     <div className="flex-1/4 h-full">
-                        <TodayFocusCard />
+                        <TopFocusCategoriesCard />
                     </div>
                 </div>
             </div>

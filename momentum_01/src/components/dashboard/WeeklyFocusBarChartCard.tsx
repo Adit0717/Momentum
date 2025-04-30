@@ -25,6 +25,11 @@ interface DayData {
 
 export default function WeeklyFocusBarChartCard() {
     const [showFocusLogsPanel, setShowFocusLogsPanel] = useState(false);
+    const [hovered, setHovered] = useState<{
+        data: DayData;
+        x: number;
+        y: number;
+    } | null>(null);
 
     // which Monday does our week start on?
     const [weekStart, setWeekStart] = useState<Date>(() => {
@@ -100,9 +105,9 @@ export default function WeeklyFocusBarChartCard() {
     };
 
     return (
-        <div className="flex flex-col w-full h-full p-4 pb-0 hover:bg-gray-50 transition">
-            <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-gray-700">
+        <div className="flex flex-col w-full h-full p-2 pb-0 hover:bg-gray-50 transition">
+            <div className="flex items-center justify-between ">
+                <h3 className="text-sm font-medium text-gray-700 px-2">
                     WEEKLY FOCUS
                 </h3>
                 <div className="flex items-center gap-4 text-gray-600">
@@ -203,6 +208,24 @@ export default function WeeklyFocusBarChartCard() {
                                                     transition:
                                                         "height 0.3s, y 0.3s",
                                                 }}
+                                                onMouseMove={(event) => {
+                                                    // get the svg container’s top-left:
+                                                    const svgRect =
+                                                        event.currentTarget.ownerSVGElement!.getBoundingClientRect();
+                                                    // compute mouse position relative to document:
+                                                    const mouseX =
+                                                        event.clientX;
+                                                    const mouseY =
+                                                        event.clientY;
+                                                    setHovered({
+                                                        data: d,
+                                                        x: mouseX,
+                                                        y: mouseY,
+                                                    });
+                                                }}
+                                                onMouseLeave={() =>
+                                                    setHovered(null)
+                                                }
                                             />
                                         );
                                     })}
@@ -225,6 +248,33 @@ export default function WeeklyFocusBarChartCard() {
                     }}
                 </ParentSize>
             </div>
+            {hovered &&
+                (() => {
+                    // compute hh and mm
+                    const total = hovered.data.seconds;
+                    const h = Math.floor(total / 3600);
+                    const m = Math.floor((total % 3600) / 60);
+                    return (
+                        <div
+                            style={{
+                                position: "fixed",
+                                left: hovered.x + 8,
+                                top: hovered.y + 8,
+                                pointerEvents: "none",
+                                background: "rgba(0,0,0,0.75)",
+                                color: "white",
+                                padding: "4px 8px",
+                                borderRadius: 4,
+                                fontSize: 12,
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            {`${h.toString().padStart(2, "0")}h ${m
+                                .toString()
+                                .padStart(2, "0")}m`}
+                        </div>
+                    );
+                })()}
         </div>
     );
 }
