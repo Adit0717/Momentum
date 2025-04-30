@@ -153,20 +153,21 @@ export default function TodoCard({
                     )}
 
                     {/* Category Pill */}
-                    {showCategories && (
-                        <div
-                            className={`flex transition-all duration-300 ease-in-out overflow-hidden ${
-                                category
-                                    ? "opacity-100 max-h-40"
-                                    : "opacity-0 max-h-0"
-                            }`}
-                        >
+                    <div
+                        className={`flex overflow-hidden transition-all duration-300 ease-in-out ${
+                            showCategories && category
+                                ? "opacity-100 max-h-40"
+                                : "opacity-0 max-h-0"
+                        }`}
+                        style={{ transitionProperty: "opacity, max-height" }}
+                    >
+                        {category && (
                             <CategoryPill
-                                label={category?.name ?? ""}
+                                label={category.name}
                                 deletable={false}
                             />
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
 
