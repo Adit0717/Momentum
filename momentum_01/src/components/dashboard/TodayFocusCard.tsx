@@ -78,7 +78,12 @@ export default function TodayFocusCard() {
                     <span className="font-mono">
                         {hrs.toString().padStart(2, "0")}
                     </span>
-                    hrs <span> {mins.toString().padStart(2, "0")}</span>mins
+                    hrs{" "}
+                    <span className="font-mono">
+                        {" "}
+                        {mins.toString().padStart(2, "0")}
+                    </span>
+                    mins
                 </div>
                 <div className="opacity-45">today's focus duration</div>
             </div>
