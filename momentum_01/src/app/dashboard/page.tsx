@@ -7,6 +7,7 @@ import TodoSection from "@/sections/TodoSection";
 import UserProfilePanel from "@/sections/UserProfilePanel";
 import useUserProfile from "@/hooks/useUserProfiles";
 import FocusView from "@/sections/FocusView";
+import UserStatsX from "@/sections/UserStatsX";
 
 export default function DashBoard() {
     const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
@@ -17,7 +18,7 @@ export default function DashBoard() {
         <div className="h-screen w-screen flex gap-4 p-5">
             {/* top-right avatar + focus toggle */}
             <div
-                className="absolute top-0 right-0 m-5 flex flex-col gap-2 bg-white pb-3 ps-3 border-gray-300 border-b-1 border-s-1 z-50 cursor-pointer"
+                className="absolute top-0 right-0 m-5 flex flex-col gap-2 bg-white pt-3 pb-3 ps-3 border-gray-300 border-b-1 border-s-1 z-50 cursor-pointer"
                 style={{ borderEndStartRadius: "36px" }}
             >
                 <Image
@@ -64,7 +65,9 @@ export default function DashBoard() {
             ${isFocusMode ? "opacity-0 pointer-events-none" : "opacity-100"}
           `}
                 >
-                    <div className="p-6"></div>
+                    <div className=" h-full w-full">
+                        <UserStatsX />
+                    </div>
                 </div>
 
                 {/* Focus View */}
